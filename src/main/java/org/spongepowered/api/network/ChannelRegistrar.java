@@ -45,7 +45,7 @@ public interface ChannelRegistrar {
      * @throws ChannelRegistrationException The channel name is too long
      * @throws ChannelRegistrationException The channel name is reserved
      */
-    ChannelBinding.IndexedMessageChannel createChannel(Object plugin, String channel) throws ChannelRegistrationException;
+    MessageChannel createChannel(Object plugin, String channel) throws ChannelRegistrationException;
 
     /**
      * Creates a new raw channel binding. The channel can be used to send and
@@ -58,7 +58,7 @@ public interface ChannelRegistrar {
      * @throws ChannelRegistrationException The channel name is reserved
      * @see #createChannel
      */
-    ChannelBinding.RawDataChannel createRawChannel(Object plugin, String channel) throws ChannelRegistrationException;
+    RawDataChannel createRawChannel(Object plugin, String channel) throws ChannelRegistrationException;
 
     /**
      * Gets a channel binding if a channel registered by that name exists.
@@ -69,7 +69,7 @@ public interface ChannelRegistrar {
     Optional<ChannelBinding> getChannel(String channel);
 
     /**
-     * Gets or creates a {@link ChannelBinding.IndexedMessageChannel} by the
+     * Gets or creates a {@link MessageChannel} by the
      * given name. If the channel exists and is a indexed message channel, then
      * it is returned. If the channel is not an indexed message channel, then
      * {@link IllegalStateException} is thrown. Otherwise, a new channel is
@@ -83,11 +83,11 @@ public interface ChannelRegistrar {
      * @throws ChannelRegistrationException for same reasons as
      *         {@link #createChannel}.
      */
-    default ChannelBinding.IndexedMessageChannel getOrCreate(Object plugin, String channel) throws ChannelRegistrationException {
+    default MessageChannel getOrCreate(Object plugin, String channel) throws ChannelRegistrationException {
         Optional<ChannelBinding> existing = getChannel(channel);
         if (existing.isPresent()) {
-            if (existing.get() instanceof ChannelBinding.IndexedMessageChannel) {
-                return (ChannelBinding.IndexedMessageChannel) existing.get();
+            if (existing.get() instanceof MessageChannel) {
+                return (MessageChannel) existing.get();
             }
             throw new IllegalStateException("Tried to get existing channel "
                     + channel + " as an IndexedMessageChannel but found it was a RawDataChannel");
@@ -96,7 +96,7 @@ public interface ChannelRegistrar {
     }
 
     /**
-     * Gets or creates a {@link ChannelBinding.RawDataChannel} by the given
+     * Gets or creates a {@link RawDataChannel} by the given
      * name. If the channel exists and is a raw data channel, then it is
      * returned. If the channel is not a raw data channel, then
      * {@link IllegalStateException} is thrown. Otherwise, a new channel is
@@ -110,11 +110,11 @@ public interface ChannelRegistrar {
      * @throws ChannelRegistrationException for same reasons as
      *         {@link #createRawChannel}.
      */
-    default ChannelBinding.RawDataChannel getOrCreateRaw(Object plugin, String channel) throws ChannelRegistrationException {
+    default RawDataChannel getOrCreateRaw(Object plugin, String channel) throws ChannelRegistrationException {
         Optional<ChannelBinding> existing = getChannel(channel);
         if (existing.isPresent()) {
-            if (existing.get() instanceof ChannelBinding.RawDataChannel) {
-                return (ChannelBinding.RawDataChannel) existing.get();
+            if (existing.get() instanceof RawDataChannel) {
+                return (RawDataChannel) existing.get();
             }
             throw new IllegalStateException("Tried to get existing channel "
                     + channel + " as a RawDataChannel but found it was an IndexedMessageChannel");
