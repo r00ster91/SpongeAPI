@@ -24,8 +24,6 @@
  */
 package org.spongepowered.api.command;
 
-import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
-
 import com.google.common.base.Preconditions;
 import org.spongepowered.api.text.Text;
 
@@ -38,15 +36,6 @@ public class CommandNotFoundException extends CommandException {
     private static final long serialVersionUID = -7714518367616848051L;
 
     private final String command;
-
-    /**
-     * Create an exception with the default message.
-     *
-     * @param command The command that was queried for
-     */
-    public CommandNotFoundException(String command) {
-        this(t("No such command"), command);
-    }
 
     /**
      * Create an exception with a custom message.

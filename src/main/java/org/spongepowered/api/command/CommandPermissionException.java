@@ -24,8 +24,6 @@
  */
 package org.spongepowered.api.command;
 
-import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
-
 import org.spongepowered.api.text.Text;
 
 /**
@@ -34,13 +32,6 @@ import org.spongepowered.api.text.Text;
  */
 public class CommandPermissionException extends CommandException {
     private static final long serialVersionUID = -6057386975881181213L;
-
-    /**
-     * Create an exception with the default message.
-     */
-    public CommandPermissionException() {
-        this(t("You do not have permission to use this command!"));
-    }
 
     /**
      * Create a permissions exception with a custom message.

@@ -24,8 +24,6 @@
  */
 package org.spongepowered.api.command;
 
-import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
-
 import org.spongepowered.api.text.Text;
 
 /**
@@ -34,13 +32,6 @@ import org.spongepowered.api.text.Text;
  */
 public class IncorrectCommandSourceException extends CommandException {
     private static final long serialVersionUID = -2927330349931825821L;
-
-    /**
-     * Create an exception with the default message.
-     */
-    public IncorrectCommandSourceException() {
-        this(t("You cannot execute this command!"));
-    }
 
     /**
      * Create a permissions exception with a custom message.
