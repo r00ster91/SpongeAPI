@@ -26,6 +26,7 @@ package org.spongepowered.api.item.inventory;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.inventory.query.QueryOperation;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.util.CopyableBuilder;
 
 /**
@@ -40,6 +41,13 @@ import org.spongepowered.api.util.CopyableBuilder;
  * consist of only slots and will never contain duplicate slots.</p>
  */
 public interface InventoryTransformation {
+
+    interface Viewable extends InventoryTransformation {
+        InventoryArchetype type();
+
+        @Override
+        ViewableInventory transform(Inventory inventory);
+    }
 
     /**
      * Transforms an Inventory
@@ -87,6 +95,6 @@ public interface InventoryTransformation {
          * @return The built transformation
          */
         InventoryTransformation build();
-
     }
+
 }

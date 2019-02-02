@@ -22,65 +22,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.item.inventory.gui;
+package org.spongepowered.api.item.inventory.property;
 
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 /**
- * An enumeration of all possible {@link GuiId}s in vanilla minecraft.
+ * An enumeration of all possible {@link ContainerType}s in vanilla minecraft.
  */
-public final class GuiIds {
+public final class ContainerTypes {
 
     // SORTFIELDS:ON
 
     /**
      * Size only multiple of 9 up to 6x9.
      */
-    public static final GuiId CHEST = DummyObjectProvider.createFor(GuiId.class, "chest"); // "minecraft:chest"
+    public static final ContainerType CHEST = DummyObjectProvider.createFor(ContainerType.class, "chest"); // "minecraft:chest"
     /**
      * Size only 3.
      */
-    public static final GuiId FURNACE = DummyObjectProvider.createFor(GuiId.class, "furnace"); // "minecraft:furnace"
+    public static final ContainerType FURNACE = DummyObjectProvider.createFor(ContainerType.class, "furnace"); // "minecraft:furnace"
     /**
      * Size only 9.
      */
-    public static final GuiId DISPENSER = DummyObjectProvider.createFor(GuiId.class, "dispenser"); // "minecraft:dispenser"
+    public static final ContainerType DISPENSER = DummyObjectProvider.createFor(ContainerType.class, "dispenser"); // "minecraft:dispenser"
     /**
      * Size only 10.
      */
-    public static final GuiId CRAFTING_TABLE = DummyObjectProvider.createFor(GuiId.class, "crafting_table"); // "minecraft:crafting_table"
+    public static final ContainerType CRAFTING_TABLE = DummyObjectProvider.createFor(ContainerType.class, "crafting_table"); // "minecraft:crafting_table"
     /**
      * Size only 5.
      */
-    public static final GuiId BREWING_STAND = DummyObjectProvider.createFor(GuiId.class, "brewing_stand"); // "minecraft:brewing_stand"
+    public static final ContainerType BREWING_STAND = DummyObjectProvider.createFor(ContainerType.class, "brewing_stand"); // "minecraft:brewing_stand"
     /**
      * Size only 5.
      */
-    public static final GuiId HOPPER = DummyObjectProvider.createFor(GuiId.class, "hopper"); // "minecraft:hopper"
+    public static final ContainerType HOPPER = DummyObjectProvider.createFor(ContainerType.class, "hopper"); // "minecraft:hopper"
     /**
      * Size only 1.
      */
-    public static final GuiId BEACON = DummyObjectProvider.createFor(GuiId.class, "beacon"); // "minecraft:beacon"
+    public static final ContainerType BEACON = DummyObjectProvider.createFor(ContainerType.class, "beacon"); // "minecraft:beacon"
     /**
      * Size only 2.
      */
-    public static final GuiId ENCHANTING_TABLE = DummyObjectProvider.createFor(GuiId.class, "enchanting_table"); // "minecraft:enchanting_table"
+    public static final ContainerType ENCHANTING_TABLE = DummyObjectProvider.createFor(ContainerType.class, "enchanting_table"); // "minecraft:enchanting_table"
     /**
      * Size only 3.
      */
-    public static final GuiId ANVIL = DummyObjectProvider.createFor(GuiId.class, "anvil"); // "minecraft:anvil"
+    public static final ContainerType ANVIL = DummyObjectProvider.createFor(ContainerType.class, "anvil"); // "minecraft:anvil"
     /**
      * Size only 3.
      */
-    public static final GuiId VILLAGER = DummyObjectProvider.createFor(GuiId.class, "villager"); // "minecraft:villager"
+    public static final ContainerType VILLAGER = DummyObjectProvider.createFor(ContainerType.class, "villager"); // "minecraft:villager"
     /**
      * Sizes 2 and more depending on the Horse Carrier.
      */
-    public static final GuiId HORSE = DummyObjectProvider.createFor(GuiId.class, "horse"); // "minecraft:horse" internally "EntityHorse"
+    public static final ContainerType HORSE = DummyObjectProvider.createFor(ContainerType.class, "horse"); // "minecraft:horse" internally "EntityHorse"
     /**
      * Size only 27 (3x9).
      */
-    public static final GuiId SHULKER_BOX = DummyObjectProvider.createFor(GuiId.class, "shulker_box"); // "minecraft:shulker_box"
+    public static final ContainerType SHULKER_BOX = DummyObjectProvider.createFor(ContainerType.class, "shulker_box"); // "minecraft:shulker_box"
 
     // SORTFIELDS:OFF
 }
