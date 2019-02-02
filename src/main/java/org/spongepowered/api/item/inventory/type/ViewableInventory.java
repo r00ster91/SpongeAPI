@@ -30,8 +30,10 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.ContainerType;
+import org.spongepowered.api.text.Text;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 /**
@@ -62,32 +64,39 @@ public interface ViewableInventory extends Inventory {
      */
     boolean canInteractWith(Player player);
 
+    static Builder builder() {
+        return new SpongeViewableInventoryBuilder();
+    }
 
     interface Builder {
-        Builder type(ContainerType type);
+        StepBuilding type(ContainerType type);
+        // throws exception when inventory cannot be viewed already
+        StepEnd ofViewable(Inventory inventory);
 
-        StepSource source(Inventory inventory);
+        interface StepBuilding {
+            StepSource source(Inventory inventory);
 
-        StepDummy dummy();
-        StepDummy dummy(ItemStackSnapshot item);
-        StepDummy dummy(int amount);
-        StepDummy dummy(int amount, ItemStackSnapshot item);
+            StepDummy dummy();
+            StepDummy dummy(ItemStackSnapshot item);
+            StepDummy dummy(int amount);
+            StepDummy dummy(int amount, ItemStackSnapshot item);
 
-        StepDummy fillDummy(ItemStackSnapshot item);
-        StepDummy fillDummy();
+            StepDummy fillDummy(ItemStackSnapshot item);
+            StepDummy fillDummy();
 
-        // ? Builder skip(int amount);
+            // complete inventory structure into lens
+            // if no slots and source added assume vanilla structure
+            // if incomplete call fillDummy()
+            StepEnd completeStructure();
+        }
 
-        interface StepSource extends Builder {
+        interface StepSource extends StepBuilding {
             StepSlot slot();
             StepSlot slots(int amount);
             StepGrid grid(int sizeX, int sizeY);
-
-            // ? StepSource skip(int amount);
-            // ? StepSource skipSource(int amount);
         }
 
-        interface StepCallback<T> extends StepSource {
+        interface StepCallback<T> extends StepBuilding {
             T click(BiConsumer<Container, Slot> handler);
             T change(BiConsumer<Container, Slot> handler);
             // autocancel changes?
@@ -102,21 +111,24 @@ public interface ViewableInventory extends Inventory {
             T at(int index);
         }
 
-        interface StepSlot extends StepSlotLike<StepSlot> {
+        interface StepSlot extends StepSlotLike<StepSlot>, StepSource {
         }
 
-        interface StepDummy extends StepSlotLike<StepDummy> {
+        interface StepDummy extends StepSlotLike<StepDummy>, StepBuilding {
         }
 
-        interface StepGrid extends StepCallback<StepSlot> {
+        interface StepGrid extends StepCallback<StepSlot>, StepSource {
             StepGrid from(int x, int y);
             StepGrid at(int x, int y);
         }
 
-        // throws exception when inventory is incomplete
-        ViewableInventory build();
+        interface StepEnd {
+            StepEnd title(Text title);
+            StepEnd identity(UUID uuid);
+
+            ViewableInventory build();
+        }
+
     }
-
-
 
 }

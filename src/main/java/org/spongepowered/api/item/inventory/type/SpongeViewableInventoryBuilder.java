@@ -1,26 +1,33 @@
 package org.spongepowered.api.item.inventory.type;
 
 import org.apache.commons.lang3.Validate;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.ContainerType;
 import org.spongepowered.api.item.inventory.property.ContainerTypes;
+import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 import javax.annotation.Nullable;
 
 // TODO move to IMPL
-public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder.StepSlot,
+public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder,
+                                                       ViewableInventory.Builder.StepSlot,
                                                        ViewableInventory.Builder.StepDummy,
-                                                       ViewableInventory.Builder.StepGrid {
+                                                       ViewableInventory.Builder.StepSource,
+                                                       ViewableInventory.Builder.StepGrid,
+                                                       ViewableInventory.Builder.StepEnd {
 
     // Helper classes
     private class SlotDefinition {
@@ -112,7 +119,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public ViewableInventory.Builder type(ContainerType type) {
+    public ViewableInventory.Builder.StepBuilding type(ContainerType type) {
         this.type = type;
         this.slotDefinitions = new HashMap<>();
         this.currentSlot = 0;
@@ -124,7 +131,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepSource source(Inventory inventory) {
+    public ViewableInventory.Builder.StepSource source(Inventory inventory) {
         this.source = inventory;
         this.currentSourceSlot = 0;
         return this;
@@ -133,33 +140,33 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     // Slots and dummies
 
     @Override
-    public StepDummy dummy(ItemStackSnapshot item) {
+    public ViewableInventory.Builder.StepDummy dummy(ItemStackSnapshot item) {
         return this.dummy(1, item);
     }
 
     @Override
-    public StepDummy dummy() {
+    public ViewableInventory.Builder.StepDummy dummy() {
         return this.dummy(ItemStackSnapshot.NONE);
     }
 
     @Override
-    public StepDummy dummy(int amount) {
+    public ViewableInventory.Builder.StepDummy dummy(int amount) {
         return this.dummy(amount, ItemStackSnapshot.NONE);
     }
 
     @Override
-    public StepDummy dummy(int amount, ItemStackSnapshot item) {
+    public ViewableInventory.Builder.StepDummy dummy(int amount, ItemStackSnapshot item) {
         writeSlots();
         Validate.isTrue(this.sourceSize >= amount, "Source Inventory is too small");
         Validate.isTrue(this.size >= amount, "Target Inventory is too small");
         for (int i = 0; i < amount; i++) {
             this.buffer.slots.add(new SlotDefinition(item));
         }
-        return (StepDummy) from(0);
+        return (ViewableInventory.Builder.StepDummy) from(0);
     }
 
     @Override
-    public StepDummy fillDummy(ItemStackSnapshot item) {
+    public ViewableInventory.Builder.StepDummy fillDummy(ItemStackSnapshot item) {
         for (int i = 0; i < this.size; i++) {
             if (!this.slotDefinitions.containsKey(i)) {
                 this.dummy(item).at(i);
@@ -169,17 +176,17 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepDummy fillDummy() {
+    public ViewableInventory.Builder.StepDummy fillDummy() {
         return this.fillDummy(ItemStackSnapshot.NONE);
     }
 
     @Override
-    public StepSlot slot() {
+    public ViewableInventory.Builder.StepSlot slot() {
         return this.slots(1);
     }
 
     @Override
-    public StepSlot slots(int amount) {
+    public ViewableInventory.Builder.StepSlot slots(int amount) {
         writeSlots();
         this.sourceSize = this.source.capacity();
         Validate.isTrue(this.sourceSize >= amount, "Source Inventory is too small");
@@ -189,11 +196,11 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
             this.buffer.slots.add(def);
         }
         this.buffer.grid = false;
-        return (StepSlot) from(0);
+        return (ViewableInventory.Builder.StepSlot) from(0);
     }
 
     @Override
-    public StepSlot from(int index) {
+    public ViewableInventory.Builder.StepSlot from(int index) {
         Validate.isTrue(this.sourceSize >= this.buffer.slots.size() + index, "Source Inventory is too small");
         int curIndex = index;
         for (SlotDefinition def : this.buffer.slots) {
@@ -203,7 +210,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepSlot at(int index) {
+    public ViewableInventory.Builder.StepSlot at(int index) {
         Validate.isTrue(this.size >= this.buffer.slots.size() + index, "Target Inventory is too small");
         this.buffer.atSlot = index;
         return this;
@@ -212,7 +219,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     // Grid
 
     @Override
-    public StepGrid grid(int sizeX, int sizeY) {
+    public ViewableInventory.Builder.StepGrid grid(int sizeX, int sizeY) {
         writeSlots();
         Validate.isTrue(this.source instanceof GridInventory, "Source Inventory is not a grid");
         // TODO type supports grids Validate.isTrue(type is a grid, "Target Inventory is not a grid");
@@ -229,7 +236,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepGrid from(int x, int y) {
+    public ViewableInventory.Builder.StepGrid from(int x, int y) {
 
         Validate.isTrue(this.sourceSizeX >= this.buffer.sizeX + x, "Source Inventory is too small");
         Validate.isTrue(this.sourceSizeY >= this.buffer.sizeY + y, "Source Inventory is too small");
@@ -250,7 +257,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepGrid at(int x, int y) {
+    public ViewableInventory.Builder.StepGrid at(int x, int y) {
         Validate.isTrue(this.sizeX >= this.buffer.sizeX + x, "Target Inventory is too small");
         Validate.isTrue(this.sizeY >= this.buffer.sizeY + y, "Target Inventory is too small");
         this.buffer.atGridX = x;
@@ -262,7 +269,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     // Callbacks
 
     @Override
-    public StepSlot click(BiConsumer<Container, Slot> handler) {
+    public ViewableInventory.Builder.StepSlot click(BiConsumer<Container, Slot> handler) {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -270,7 +277,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepSlot change(BiConsumer<Container, Slot> handler) {
+    public ViewableInventory.Builder.StepSlot change(BiConsumer<Container, Slot> handler) {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -278,7 +285,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepSlot autoCancel() {
+    public ViewableInventory.Builder.StepSlot autoCancel() {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -286,7 +293,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepSlot denyShiftMove() {
+    public ViewableInventory.Builder.StepSlot denyShiftMove() {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -294,7 +301,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepSlot allowShiftMove() {
+    public ViewableInventory.Builder.StepSlot allowShiftMove() {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -304,12 +311,33 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     // Build
 
     @Override
-    public ViewableInventory build() {
+    public ViewableInventory.Builder.StepEnd completeStructure() {
+        // TODO build lens
+        return this;
+    }
+
+    @Override
+    public StepEnd ofViewable(Inventory inventory) {
+        // TODO copy type from inventory
+        return null;
+    }
+
+    @Override
+    public ViewableInventory.Builder.StepEnd title(Text title) {
         // TODO
         return null;
     }
 
+    @Override public StepEnd identity(UUID uuid) {
+        // TODO
+        return null;
+    }
 
+    @Override
+    public ViewableInventory build() {
+        // TODO
+        return null;
+    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // EXAMPLE USAGE:
@@ -317,12 +345,13 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
 
     static void foobar()
     {
-        ViewableInventory.Builder builder = null;
         Object plugin = null;
+        // TODO nuke InventoryArchetypes?
         Inventory inv1 = Inventory.builder().of(InventoryArchetypes.DISPENSER).build(plugin);
         Inventory inv2 = Inventory.builder().of(InventoryArchetypes.DISPENSER).build(plugin);
         Inventory inv3 = Inventory.builder().of(InventoryArchetypes.CHEST).build(plugin);
-        ViewableInventory inv = builder
+
+        ViewableInventory inv = ViewableInventory.builder()
                 .type(ContainerTypes.CHEST)
                 .source(inv1).grid(3, 3)
                 .source(inv2).grid(3, 3).at(3, 1)
@@ -330,7 +359,24 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
                 .slot().from(0).at(37).change(SpongeViewableInventoryBuilder::onChangeMySlot)
                 .dummy().at(16).click(SpongeViewableInventoryBuilder::onClickMySlot)
                 .fillDummy()
+                .completeStructure()
+                .title(Text.of("test"))
+                .identity(UUID.randomUUID())
                 .build();
+
+        ViewableInventory newTitle = ViewableInventory.builder().ofViewable(inv3).title(Text.of("alternative title")).build();
+
+        ViewableInventory basicChest = ViewableInventory.builder().type(ContainerTypes.CHEST).completeStructure().build();
+
+        // ###
+        // #O#
+        // ###
+        ViewableInventory display = ViewableInventory.builder().type(ContainerTypes.DISPENSER)
+                .fillDummy(ItemStack.of(ItemTypes.LIGHT_GRAY_STAINED_GLASS_PANE, 1).createSnapshot())
+                .source(inv2).grid(1,1).from(1,1).at(1,1)
+                .completeStructure().build();
+
+
 
 
     }
