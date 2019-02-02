@@ -1,10 +1,11 @@
 package org.spongepowered.api.item.inventory.type;
 
 import org.apache.commons.lang3.Validate;
+import org.spongepowered.api.event.item.inventory.container.InteractContainerEvent;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -285,7 +287,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public ViewableInventory.Builder.StepSlot autoCancel() {
+    public StepSlot autoCancel(boolean enable) {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -293,7 +295,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public ViewableInventory.Builder.StepSlot denyShiftMove() {
+    public StepSlot shiftMove(boolean allow) {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -301,7 +303,15 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public ViewableInventory.Builder.StepSlot allowShiftMove() {
+    public StepEnd carrier(Carrier carrier) {
+        for (SlotDefinition def : this.buffer.slots) {
+            // TODO
+        }
+        return this;
+    }
+
+    @Override
+    public <E extends InteractContainerEvent> StepEnd listener(Class<E> type, Consumer<E> listener) {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -345,39 +355,40 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
 
     static void foobar()
     {
-        Object plugin = null;
-        // TODO nuke InventoryArchetypes?
-        Inventory inv1 = Inventory.builder().of(InventoryArchetypes.DISPENSER).build(plugin);
-        Inventory inv2 = Inventory.builder().of(InventoryArchetypes.DISPENSER).build(plugin);
-        Inventory inv3 = Inventory.builder().of(InventoryArchetypes.CHEST).build(plugin);
+Inventory inv1 = Inventory.builder().grid(3, 3).completeStructure().build();
+Inventory inv2 = Inventory.builder().grid(3, 3).completeStructure().build();
+Inventory inv3 = Inventory.builder().grid(9, 3).completeStructure().build();
 
-        ViewableInventory inv = ViewableInventory.builder()
-                .type(ContainerTypes.CHEST)
-                .source(inv1).grid(3, 3)
-                .source(inv2).grid(3, 3).at(3, 1)
-                .source(inv3).grid(3, 3).from(3, 0).at(6, 3)
-                .slot().from(0).at(37).change(SpongeViewableInventoryBuilder::onChangeMySlot)
-                .dummy().at(16).click(SpongeViewableInventoryBuilder::onClickMySlot)
-                .fillDummy()
-                .completeStructure()
-                .title(Text.of("test"))
-                .identity(UUID.randomUUID())
-                .build();
+ViewableInventory inv = ViewableInventory.builder()
+        .type(ContainerTypes.CHEST)
+        .source(inv1).grid(3, 3)
+        .source(inv2).grid(3, 3).at(3, 1)
+        .source(inv3).grid(3, 3).from(3, 0).at(6, 3)
+        .slot().from(0).at(37).change(SpongeViewableInventoryBuilder::onChangeMySlot)
+        .dummy().at(16).click(SpongeViewableInventoryBuilder::onClickMySlot)
+        .fillDummy()
+        .completeStructure()
+        .title(Text.of("test"))
+        .identity(UUID.randomUUID())
+        .build();
 
-        ViewableInventory newTitle = ViewableInventory.builder().ofViewable(inv3).title(Text.of("alternative title")).build();
+ViewableInventory basicChest = ViewableInventory.builder()
+        .type(ContainerTypes.CHEST)
+        .completeStructure()
+        .build();
 
-        ViewableInventory basicChest = ViewableInventory.builder().type(ContainerTypes.CHEST).completeStructure().build();
+ViewableInventory withTitle = ViewableInventory.builder()
+        .ofViewable(basicChest)
+        .title(Text.of("title"))
+        .build();
 
-        // ###
-        // #O#
-        // ###
-        ViewableInventory display = ViewableInventory.builder().type(ContainerTypes.DISPENSER)
-                .fillDummy(ItemStack.of(ItemTypes.LIGHT_GRAY_STAINED_GLASS_PANE, 1).createSnapshot())
-                .source(inv2).grid(1,1).from(1,1).at(1,1)
-                .completeStructure().build();
+ItemStackSnapshot disabled = ItemStack.of(ItemTypes.LIGHT_GRAY_STAINED_GLASS_PANE, 1).createSnapshot();
 
-
-
+ViewableInventory display = ViewableInventory.builder().type(ContainerTypes.DISPENSER)
+        .fillDummy(disabled)
+        .source(inv2).grid(1,1).from(1,1).at(1,1)
+        .completeStructure().build();
+display.query(GridInventory.class).get().set(1,1, ItemStack.of(ItemTypes.DIAMOND, 1));
 
     }
 

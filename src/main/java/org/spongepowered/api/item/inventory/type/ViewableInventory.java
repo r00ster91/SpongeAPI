@@ -25,6 +25,8 @@
 package org.spongepowered.api.item.inventory.type;
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.item.inventory.container.InteractContainerEvent;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -35,6 +37,7 @@ import org.spongepowered.api.text.Text;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Interface for inventories which may be interacted with by Players.
@@ -63,6 +66,8 @@ public interface ViewableInventory extends Inventory {
      * @return true if the Entity is able to interact with this Inventory
      */
     boolean canInteractWith(Player player);
+
+    ContainerType getContainerType();
 
     static Builder builder() {
         return new SpongeViewableInventoryBuilder();
@@ -100,10 +105,9 @@ public interface ViewableInventory extends Inventory {
             T click(BiConsumer<Container, Slot> handler);
             T change(BiConsumer<Container, Slot> handler);
             // autocancel changes?
-            T autoCancel();
+            T autoCancel(boolean enable);
             // shift-click behaviour?
-            T denyShiftMove();
-            T allowShiftMove();
+            T shiftMove(boolean allow);
         }
 
         interface StepSlotLike<T> extends StepCallback<T> {
@@ -125,6 +129,8 @@ public interface ViewableInventory extends Inventory {
         interface StepEnd {
             StepEnd title(Text title);
             StepEnd identity(UUID uuid);
+            StepEnd carrier(Carrier carrier);
+            <E extends InteractContainerEvent> StepEnd listener(Class<E> type, Consumer<E> listener);
 
             ViewableInventory build();
         }
