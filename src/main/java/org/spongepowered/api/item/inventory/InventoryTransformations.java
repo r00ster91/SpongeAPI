@@ -56,7 +56,4 @@ public class InventoryTransformations {
      */
     public static final InventoryTransformation EMPTY = DummyObjectProvider.createFor(InventoryTransformation.class, "EMPTY");
 
-    public static final InventoryTransformation.Viewable SINGLE_CHEST = DummyObjectProvider.createFor(InventoryTransformation.Viewable.class, "SINGLE_CHEST");
-    public static final InventoryTransformation.Viewable DOUBLE_CHEST = DummyObjectProvider.createFor(InventoryTransformation.Viewable.class, "DOUBLE_CHEST");
-
 }

@@ -25,18 +25,14 @@
 package org.spongepowered.api.item.inventory.type;
 
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.item.inventory.container.ClickContainerEvent;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.ContainerType;
-import org.spongepowered.api.item.inventory.property.ContainerTypes;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * Interface for inventories which may be interacted with by Players.
@@ -80,20 +76,36 @@ public interface ViewableInventory extends Inventory {
         StepDummy fillDummy(ItemStackSnapshot item);
         StepDummy fillDummy();
 
+        // ? Builder skip(int amount);
+
         interface StepSource extends Builder {
             StepSlot slot();
             StepSlot slots(int amount);
             StepGrid grid(int sizeX, int sizeY);
+
+            // ? StepSource skip(int amount);
+            // ? StepSource skipSource(int amount);
         }
 
         interface StepCallback<T> extends StepSource {
             T click(BiConsumer<Container, Slot> handler);
             T change(BiConsumer<Container, Slot> handler);
+            // autocancel changes?
+            T autoCancel();
+            // shift-click behaviour?
+            T denyShiftMove();
+            T allowShiftMove();
         }
 
-        interface StepSlot extends StepCallback<StepSlot> {
-            StepSlot from(int index);
-            StepSlot at(int index);
+        interface StepSlotLike<T> extends StepCallback<T> {
+            T from(int index);
+            T at(int index);
+        }
+
+        interface StepSlot extends StepSlotLike<StepSlot> {
+        }
+
+        interface StepDummy extends StepSlotLike<StepDummy> {
         }
 
         interface StepGrid extends StepCallback<StepSlot> {
@@ -101,41 +113,10 @@ public interface ViewableInventory extends Inventory {
             StepGrid at(int x, int y);
         }
 
-        interface StepDummy extends StepCallback<StepDummy> {
-            StepDummy from(int index);
-            StepDummy at(int index);
-        }
-
         // throws exception when inventory is incomplete
         ViewableInventory build();
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // EXAMPLE USAGE:
-
-    static void foobar()
-    {
-        Builder builder = null;
-        Object plugin = null;
-        Inventory inv1 = Inventory.builder().of(InventoryArchetypes.DISPENSER).build(plugin);
-        Inventory inv2 = Inventory.builder().of(InventoryArchetypes.DISPENSER).build(plugin);
-        Inventory inv3 = Inventory.builder().of(InventoryArchetypes.CHEST).build(plugin);
-        ViewableInventory inv = builder
-                .type(ContainerTypes.CHEST)
-                .source(inv1).grid(3, 3)
-                .source(inv2).grid(3, 3).at(3, 1)
-                .source(inv3).grid(3, 3).from(3, 0).at(6, 3)
-                .dummy().at(3).click(ViewableInventory::onClickMySlot).change(ViewableInventory::onChangeMySlot)
-                .fillDummy()
-                .build();
-
-
-    }
-
-    static void onClickMySlot(Container container, Slot slot) {  }
-    static void onChangeMySlot(Container container, Slot slot) {  }
-
-    // ---------------------------------------------------------------------------------------------------------------------------
 
 
 }
