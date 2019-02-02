@@ -28,8 +28,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.ArgumentParseException;
 import org.spongepowered.api.command.parameter.managed.ValueParameterModifier;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.ResettableBuilder;
 

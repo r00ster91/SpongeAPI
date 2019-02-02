@@ -25,10 +25,8 @@
 package org.spongepowered.api.command.managed;
 
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.util.annotation.CatalogedBy;
-
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 

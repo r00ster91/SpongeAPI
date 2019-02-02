@@ -24,8 +24,7 @@
  */
 package org.spongepowered.api.command.dispatcher;
 
-import org.spongepowered.api.command.CommandMapping;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.manager.CommandMapping;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.util.List;

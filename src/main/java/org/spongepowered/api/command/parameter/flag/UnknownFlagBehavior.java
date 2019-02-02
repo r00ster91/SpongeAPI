@@ -25,7 +25,6 @@
 package org.spongepowered.api.command.parameter.flag;
 
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.ArgumentParseException;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.token.CommandArgs;

@@ -22,25 +22,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.command;
+package org.spongepowered.api.command.manager;
 
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.Command;
+
+import java.util.Set;
 
 /**
- * Thrown when invocation of a command fails, wrapping the exception that
- * is thrown.
+ * Provides information about a mapping between a command and its aliases.
+ *
+ * <p>Implementations are not required to implement a sane
+ * {@link Object#equals(Object)} but may choose to do so.</p>
  */
-public class InvocationCommandException extends CommandException {
-    private static final long serialVersionUID = 2123904283741023948L;
+public interface CommandMapping {
 
     /**
-     * Constructs a new exception with the given message and the given cause.
+     * Gets the primary alias.
      *
-     * @param message The detail message
-     * @param cause The cause
+     * @return The primary alias
      */
-    public InvocationCommandException(Text message, Throwable cause) {
-        super(message, cause);
-    }
+    String getPrimaryAlias();
+
+    /**
+     * Gets an immutable list of all aliases.
+     *
+     * <p>The returned list must contain at least one entry, of which one must
+     * be the one returned by {@link #getPrimaryAlias()}.</p>
+     *
+     * <p>There may be several versions of the same alias with different
+     * casing, although generally implementations should ignore the casing
+     * of aliases.</p>
+     *
+     * @return A set of aliases
+     */
+    Set<String> getAllAliases();
+
+    /**
+     * Gets the {@link Command} associated with this mapping.
+     *
+     * @return The {@link Command}
+     */
+    Command getCommand();
 
 }

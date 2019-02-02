@@ -22,27 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.command;
+package org.spongepowered.api.command.exception;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
-public class CommandMessageFormatting {
+/**
+ * Thrown when invocation of a command fails, wrapping the exception that
+ * is thrown.
+ */
+public class InvocationCommandException extends CommandException {
+    private static final long serialVersionUID = 2123904283741023948L;
 
-    private CommandMessageFormatting() {
+    /**
+     * Constructs a new exception with the given message and the given cause.
+     *
+     * @param message The detail message
+     * @param cause The cause
+     */
+    public InvocationCommandException(Text message, Throwable cause) {
+        super(message, cause);
     }
-
-    public static final Text FORWARD_SLASH = Text.of("/");
-    public static final Text COMMA_SPACE = Text.of(", ");
-    public static final Text LEFT_SQUARE = Text.of("[");
-    public static final Text RIGHT_SQUARE = Text.of("]");
-    public static final Text PIPE_TEXT = Text.of("|");
-    public static final Text SPACE_TEXT = Text.of(" ");
-    public static final Text STAR_TEXT = Text.of("*");
-    public static final Text LT_TEXT = Text.of("<");
-    public static final Text GT_TEXT = Text.of(">");
-    public static final Text ELLIPSIS_TEXT = Text.of("…");
-    public static final Text LEFT_PARENTHESIS = Text.of("(");
-    public static final Text RIGHT_PARENTHESIS = Text.of(")");
 
 }

@@ -25,7 +25,7 @@
 package org.spongepowered.api.command.dispatcher;
 
 import org.spongepowered.api.command.Command;
-import org.spongepowered.api.command.CommandMapping;
+import org.spongepowered.api.command.manager.CommandMapping;
 
 import java.util.Collection;
 import java.util.Map;

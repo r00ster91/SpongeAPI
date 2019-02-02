@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.command;
+package org.spongepowered.api.command.exception;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.TextMessageException;

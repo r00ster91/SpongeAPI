@@ -26,9 +26,12 @@ package org.spongepowered.api.command;
 
 import com.google.common.collect.Lists;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.managed.ChildExceptionBehavior;
 import org.spongepowered.api.command.managed.ChildExceptionBehaviors;
 import org.spongepowered.api.command.managed.CommandExecutor;
+import org.spongepowered.api.command.manager.CommandManager;
+import org.spongepowered.api.command.manager.CommandMapping;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.flag.Flags;
 import org.spongepowered.api.command.parameter.token.InputTokenizer;
@@ -44,7 +47,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 
 import javax.annotation.Nullable;
 

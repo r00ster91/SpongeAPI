@@ -24,7 +24,7 @@
  */
 package org.spongepowered.api.command.managed;
 
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.CommandContext;

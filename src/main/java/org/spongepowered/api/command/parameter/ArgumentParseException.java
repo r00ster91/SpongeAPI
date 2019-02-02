@@ -25,7 +25,7 @@
 package org.spongepowered.api.command.parameter;
 
 import com.google.common.base.Strings;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.text.Text;
 
 /**

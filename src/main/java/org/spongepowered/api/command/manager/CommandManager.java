@@ -22,21 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.command;
+package org.spongepowered.api.command.manager;
 
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.dispatcher.Dispatcher;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
@@ -189,9 +189,7 @@ public interface CommandManager extends Dispatcher {
     /**
      * Execute the command based on input arguments. The {@link Cause} of the
      * invocation will be taken from the {@link CauseStackManager} at the time
-     * this method is invoked, with the {@link EventContextKeys#COMMAND_SOURCE}
-     * {@link EventContextKeys#COMMAND_PERMISSION_SUBJECT} set to the specified
-     * {@link CommandSource}.
+     * this method is invoked.
      *
      * <p>The implementing class must perform the necessary permission
      * checks.</p>
@@ -241,14 +239,12 @@ public interface CommandManager extends Dispatcher {
      *     performing tab completion
      * @return A list of suggestions
      */
-    List<String> getSuggestions(String arguments, @Nullable Location<World> targetPosition);
+    List<String> getSuggestions(String arguments, @Nullable Location targetPosition);
 
     /**
      * Gets a list of suggestions based on input. The {@link Cause} of the
      * invocation will be taken from the {@link CauseStackManager} at the time
-     * this method is invoked, with the {@link EventContextKeys#COMMAND_SOURCE}
-     * and {@link EventContextKeys#COMMAND_PERMISSION_SUBJECT} set to the
-     * specified {@link CommandSource}.
+     * this method is invoked.
      *
      * <p>If a suggestion is chosen by the user, it will replace the last
      * word.</p>
@@ -263,7 +259,7 @@ public interface CommandManager extends Dispatcher {
      *     performing tab completion
      * @return A list of suggestions
      */
-    List<String> getSuggestions(CommandSource commandSource, String arguments, @Nullable Location<World> targetPosition);
+    List<String> getSuggestions(CommandSource commandSource, String arguments, @Nullable Location targetPosition);
 
     /**
      * Gets a list of suggestions based on input.
@@ -282,7 +278,7 @@ public interface CommandManager extends Dispatcher {
      *     performing tab completion
      * @return A list of suggestions
      */
-    List<String> getSuggestions(Cause cause, String arguments, @Nullable Location<World> targetPosition);
+    List<String> getSuggestions(Cause cause, String arguments, @Nullable Location targetPosition);
 
     /**
      * Gets the primary alias for the supplied {@link Command}, if it

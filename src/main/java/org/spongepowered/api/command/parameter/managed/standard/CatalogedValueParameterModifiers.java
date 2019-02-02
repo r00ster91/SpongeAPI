@@ -29,7 +29,6 @@ import org.spongepowered.api.command.parameter.managed.ValueParameterModifier;
 import org.spongepowered.api.command.source.RemoteSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 import java.net.InetAddress;
