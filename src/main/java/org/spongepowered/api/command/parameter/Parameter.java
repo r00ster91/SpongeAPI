@@ -31,13 +31,10 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.managed.SelectorParser;
 import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 import org.spongepowered.api.command.parameter.managed.ValueParameter;
-import org.spongepowered.api.command.parameter.managed.ValueParameterModifier;
 import org.spongepowered.api.command.parameter.managed.ValueParser;
 import org.spongepowered.api.command.parameter.managed.ValueUsage;
-import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameterModifiers;
 import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
 import org.spongepowered.api.command.parameter.managed.standard.OptionalParameterFlag;
-import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameterModifiers;
 import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
 import org.spongepowered.api.command.parameter.token.CommandArgs;
 import org.spongepowered.api.data.DataContainer;
@@ -45,6 +42,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Color;
@@ -58,6 +56,7 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URL;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -229,13 +228,13 @@ public interface Parameter {
 
     /**
      * Creates a builder that has the {@link ValueParameter} set to
-     * {@link CatalogedValueParameters#DATA_CONTAINER}, with the modifier
-     * {@link CatalogedValueParameterModifiers#OR_CURRENT_DATE_TIME}.
+     * {@link CatalogedValueParameters#DATE_TIME}, returning the current
+     * {@link LocalDateTime}.
      *
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<LocalDateTime> dateTimeOrNow() {
-        return dateTime().modifier(CatalogedValueParameterModifiers.OR_CURRENT_DATE_TIME);
+        return dateTime().orDefault(LocalDateTime::now);
     }
 
     /**
@@ -280,24 +279,24 @@ public interface Parameter {
 
     /**
      * Creates a builder that has the {@link ValueParameter} set to
-     * {@link CatalogedValueParameters#ENTITY}, with the
-     * {@link CatalogedValueParameterModifiers#OR_ENTITY_SOURCE} modifier.
+     * {@link CatalogedValueParameters#ENTITY}, using the {@link CommandSource}
+     * as the default if they are an {@link Entity}
      *
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Entity> entityOrSource() {
-        return entity().modifier(CatalogedValueParameterModifiers.OR_ENTITY_SOURCE);
+        return entity().orDefault((cause, source) -> source instanceof Entity ? (Entity) source : null);
     }
 
     /**
      * Creates a builder that has the {@link ValueParameter} set to
-     * {@link CatalogedValueParameters#ENTITY}, with the
-     * {@link CatalogedValueParameterModifiers#OR_ENTITY_TARGET} modifier.
+     * {@link CatalogedValueParameters#ENTITY}
      *
      * @return A {@link Parameter.Value.Builder}
      */
+    // TODO: Entity Target
     static Parameter.Value.Builder entityOrTarget() {
-        return entity().modifier(CatalogedValueParameterModifiers.OR_ENTITY_TARGET);
+        return entity();
     }
 
     /**
@@ -342,13 +341,14 @@ public interface Parameter {
 
     /**
      * Creates a builder that has the {@link ValueParameter} set to
-     * {@link CatalogedValueParameters#IP}, with the
-     * {@link CatalogedValueParameterModifiers#OR_SOURCE_IP} modifier.
+     * {@link CatalogedValueParameters#IP}, defaulting to the source's
+     * {@link InetAddress}
      *
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder ipOrSource() {
-        return Parameter.builder(CatalogedValueParameters.IP).modifier(CatalogedValueParameterModifiers.OR_SOURCE_IP);
+        return Parameter.builder(CatalogedValueParameters.IP)
+                .orDefault((cause, source) -> source instanceof RemoteConnection ? ((RemoteConnection) source).getAddress().getAddress() : null);
     }
 
     /**
@@ -403,24 +403,24 @@ public interface Parameter {
 
     /**
      * Creates a builder that has the {@link ValueParameter} set to
-     * {@link CatalogedValueParameters#PLAYER}, with the
-     * {@link CatalogedValueParameterModifiers#OR_PLAYER_SOURCE} modifier.
+     * {@link CatalogedValueParameters#PLAYER}, defaulting to the
+     * {@link CommandSource} if it is a {@link Player}.
      *
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Player> playerOrSource() {
-        return player().modifier(CatalogedValueParameterModifiers.OR_PLAYER_SOURCE);
+        return player().orDefault((cause, source) -> source instanceof Player ? (Player) source : null);
     }
 
     /**
      * Creates a builder that has the {@link ValueParameter} set to
-     * {@link CatalogedValueParameters#PLAYER}, with the
-     * {@link CatalogedValueParameterModifiers#OR_PLAYER_TARGET} modifier.
+     * {@link CatalogedValueParameters#PLAYER}, else the target
      *
      * @return A {@link Parameter.Value.Builder}
      */
+    // TODO: Sort out target part
     static Parameter.Value.Builder<Player> playerOrTarget() {
-        return player().modifier(CatalogedValueParameterModifiers.OR_PLAYER_TARGET);
+        return player();
     }
 
     /**
@@ -485,13 +485,13 @@ public interface Parameter {
 
     /**
      * Creates a builder that has the {@link ValueParameter} set to
-     * {@link CatalogedValueParameters#ENTITY}, with the
-     * {@link CatalogedValueParameterModifiers#OR_PLAYER_SOURCE} modifier.
+     * {@link CatalogedValueParameters#USER}, reutrning the source
+     * if necessary.
      *
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<User> userOrSource() {
-        return user().modifier(CatalogedValueParameterModifiers.OR_PLAYER_SOURCE);
+        return user().orDefault((cause, source) -> source instanceof User ? (User) source : null);
     }
 
     /**
@@ -675,9 +675,44 @@ public interface Parameter {
     Text getUsage(Cause cause);
 
     /**
+     * Represents a set of {@link Parameter}s to try to parse an argument.
+     *
+     * @param <T> The type of value that is returned.
+     */
+    interface ValueGroup<T> extends Parameter {
+
+        /**
+         * Gets the key associated with this parameter. This key will override
+         * child parameter keys.
+         *
+         * @return The key.
+         */
+        Text key();
+
+        /**
+         * The {@link Value}s to use when parsing an argument. They will be
+         * tried in this order.
+         *
+         * @return The parameters.
+         */
+        Collection<ValueParser<? extends T>> parametersToTry();
+
+        Optional<ValueCompleter> completer();
+
+        interface Builder<T> extends ResettableBuilder<ValueGroup<T>, Builder<T>> {
+
+            Builder<T> valueParser(ValueParser<? extends T> parser);
+
+            Builder<T> setCompleter(ValueCompleter completer);
+
+            ValueGroup<T> build();
+        }
+    }
+
+    /**
      * Represents a {@link Parameter} that returns a value from an argument.
      *
-     * @param <T> The type of value that is returned, if any.
+     * @param <T> The type of value that is returned.
      */
     interface Value<T> extends Parameter {
 
@@ -701,44 +736,6 @@ public interface Parameter {
          * @return The {@link ValueCompleter}.
          */
         ValueCompleter getCompleter();
-
-        /**
-         * Gets the {@link ValueParameterModifier}s associated with this
-         * {@link Value}
-         *
-         * <p>The order is important, the modifiers will be traversed in
-         * order.</p>
-         *
-         * @return The {@link ValueParameterModifier}s, if any.
-         */
-        Collection<ValueParameterModifier<? extends T>> getModifiers();
-
-        /**
-         * Provides the builder for the specific type.
-         */
-        interface BuilderProvider extends ResettableBuilder<Parameter.Value.Builder<?>, BuilderProvider> {
-
-            /**
-             * Creates a builder to create a {@link Parameter.Value}
-             *
-             * @param parser The {@link ValueParser<T>}
-             * @param <T> The type of value that is returned by the
-             *            {@code parser}
-             * @return The {@link Builder}
-             */
-            <T> Builder<T> createBuilderFor(ValueParser<T> parser);
-
-            /**
-             * Creates a builder to create a {@link Parameter.Value}
-             *
-             * @param clazz The {@link Class<T>} that indicates the value type
-             *              this parses
-             * @param <T> The type of value that is returned by the {@code parser}
-             * @return The {@link Builder}
-             */
-            <T> Builder<T> createBuilderFor(Class<T> clazz);
-
-        }
 
         /**
          * Builds a {@link Parameter} from constituent components.
@@ -774,9 +771,6 @@ public interface Parameter {
              * unless this builder's {@link #setSuggestions(ValueCompleter)}} and
              * {@link #setUsage(ValueUsage)} methods are specified.
              *
-             * <p>Setting the parser will clear all {@link ValueParameterModifier}s
-             * as they may not be compatible with the new value.</p>
-             *
              * @param parser The {@link ValueParameter} to use
              * @return This builder, for chaining
              */
@@ -809,42 +803,6 @@ public interface Parameter {
              * @return This builder, for chaining
              */
             Builder<T> setUsage(@Nullable ValueUsage usage);
-
-            /**
-             * Adds a {@link ValueParameterModifier} that modify the behavior of the
-             * parameter, for example, by requiring that only one output is
-             * obtained.
-             *
-             * <p>Note that the modifiers wrap around the call to the value parser,
-             * the first will be called which will be expected to call into
-             * later modifiers. They will be called in the order they are added to
-             * the builder.</p>
-             *
-             * @param modifier  The modifier
-             * @return This builder, for chaining
-             */
-            <S extends T> Builder<T> modifier(ValueParameterModifier<S> modifier);
-
-            /**
-             * Adds {@link ValueParameterModifier}s that modify the behavior of the
-             * parameter, for example, by requiring that only one output is
-             * obtained.
-             *
-             * <p>Note that the modifiers wrap around the call to the value parser,
-             * the first will be called which will be expected to call into
-             * later modifiers. They will be called in this order.</p>
-             *
-             * @param modifiers The modifiers, in the order that they should
-             *                  be executed
-             * @return This builder, for chaining
-             */
-            default Builder<T> modifiers(List<ValueParameterModifier<? extends T>> modifiers) {
-                for (ValueParameterModifier<? extends T> modifier : modifiers) {
-                    modifier(modifier);
-                }
-
-                return this;
-            }
 
             /**
              * Sets the {@link SelectorParser} that is used to parse a selector if
@@ -923,7 +881,7 @@ public interface Parameter {
             /**
              * Sets whether this parameter is optional.
              *
-             * <p>If {@link #optionalOrDefault(Object)}</p>
+             * <p>If {@link #orDefault(Object)}</p>
              *
              * @param optionalFlag The {@link OptionalParameterFlag}
              * @return This builder, for chaining
@@ -942,9 +900,8 @@ public interface Parameter {
              *                     enter a value into the {@link CommandContext}
              * @return This builder, for chaining
              */
-            default Builder<T> optionalOrDefault(T defaultValue) {
-                Optional<T> result = Optional.of(defaultValue);
-                return optionalOrDefault((cause, commandSource) -> result);
+            default Builder<T> orDefault(T defaultValue) {
+                return orDefault((cause, commandSource) -> defaultValue);
             }
 
             /**
@@ -964,14 +921,12 @@ public interface Parameter {
              * @param defaultValueSupplier A {@link Supplier} that returns an object
              *                             to insert into the context if this
              *                             parameter cannot parse the argument. If
-             *                             the supplier returns an empty optional,
+             *                             the supplier returns a null,
              *                             the parameter will throw an exception, as
              *                             if the parameter is not optional.
              * @return This builder, for chaining
              */
-            default Builder<T> optionalOrDefault(Supplier<T> defaultValueSupplier) {
-                return optionalOrDefault((cause, commandSource) -> Optional.ofNullable(defaultValueSupplier.get()));
-            }
+            Builder<T> orDefault(Supplier<T> defaultValueSupplier);
 
             /**
              * Marks this parameter as optional, such that if an argument does not
@@ -990,14 +945,12 @@ public interface Parameter {
              * @param defaultValueFunction A {@link Function} that returns an object
              *                             to insert into the context if this
              *                             parameter cannot parse the argument. If
-             *                             the supplier returns an empty optional,
+             *                             the supplier returns a null,
              *                             the parameter will throw an exception, as
              *                             if the parameter is not optional.
              * @return This builder, for chaining
              */
-            default Builder<T> optionalOrDefault(BiFunction<Cause, CommandSource, Optional<T>> defaultValueFunction) {
-                return modifier(VariableValueParameterModifiers.defaultValueModifierBuilder().setDefaultValueFunction(defaultValueFunction).build());
-            }
+            Builder<T> orDefault(BiFunction<Cause, CommandSource, T> defaultValueFunction);
 
             /**
              * Creates a {@link Parameter} from the builder.
