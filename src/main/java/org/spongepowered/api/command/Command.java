@@ -24,19 +24,15 @@
  */
 package org.spongepowered.api.command;
 
-import com.google.common.collect.Lists;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.managed.ChildExceptionBehavior;
 import org.spongepowered.api.command.managed.ChildExceptionBehaviors;
 import org.spongepowered.api.command.managed.CommandExecutor;
-import org.spongepowered.api.command.manager.CommandManager;
-import org.spongepowered.api.command.manager.CommandMapping;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.flag.Flags;
 import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.world.Location;
@@ -45,8 +41,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -64,13 +60,8 @@ import javax.annotation.Nullable;
  * Custom implementations of this class are not required to implement a sane
  * {@link Object#equals(Object)}, but are highly encouraged to do so.</p>
  *
- * <p>Commands in Sponge are provided with a {@link Cause}, as well as an
- * associated {@link CommandSource}. Note that the {@link CommandSource} is
- * not necessarily the object that actually invoked the command, however, it
- * is the source that is <strong>responsible</strong> for the command. Therefore,
- * in general, command eligibility checks should be performed against the
- * provided {@link CommandSource}. However, users and implementors may act upon
- * the {@link Cause} alone as they see fit, should it be preferred.</p>
+ * <p>Commands in Sponge are provided with a {@link Cause}, which explains
+ * who <em>directly</em> invoked the </p>
  */
 public interface Command {
 
@@ -90,13 +81,11 @@ public interface Command {
      * checks.</p>
      *
      * @param cause The {@link Cause} of the command
-     * @param source The {@link CommandSource} responsible for the invocation of
-     *               the command
      * @param arguments The raw arguments for this command
      * @return The result of a command being processed
      * @throws CommandException Thrown on a command error
      */
-    CommandResult process(Cause cause, CommandSource source, String arguments) throws CommandException;
+    CommandResult process(Cause cause, String arguments) throws CommandException;
 
     /**
      * Gets a list of suggestions based on input.
@@ -105,15 +94,13 @@ public interface Command {
      * word.</p>
      *
      * @param cause The {@link Cause} of the command
-     * @param source The {@link CommandSource} responsible for the invocation of
-     *               the command
      * @param arguments The arguments entered up to this point
      * @param targetPosition The position the source is looking at when
      *     performing tab completion
      * @return A list of suggestions
      * @throws CommandException Thrown if there was a parsing error
      */
-    List<String> getSuggestions(Cause cause, CommandSource source, String arguments, @Nullable Location targetPosition) throws CommandException;
+    List<String> getSuggestions(Cause cause, String arguments, @Nullable Location targetPosition) throws CommandException;
 
     /**
      * Test whether this command can probably be executed given this
@@ -125,9 +112,9 @@ public interface Command {
      * listings.</p>
      *
      * @param cause The {@link Cause} to check
-     * @return Whether permission is (probably) granted
+     * @return Whether this command will execute
      */
-    boolean canExecute(Cause cause, CommandSource source);
+    boolean canExecute(Cause cause);
 
     /**
      * Gets a short one-line description of this command.
@@ -135,10 +122,9 @@ public interface Command {
      * <p>The help system may display the description in the command list.</p>
      *
      * @param cause The {@link Cause} of the help request
-     * @param source The {@link CommandSource} responsible for the request
      * @return A description
      */
-    Optional<Text> getShortDescription(Cause cause, CommandSource source);
+    Optional<Text> getShortDescription(Cause cause);
 
     /**
      * Gets a longer formatted help message about this command.
@@ -153,10 +139,9 @@ public interface Command {
      * detailed information about a command.</p>
      *
      * @param cause The {@link Cause} of the help request
-     * @param source The {@link CommandSource} responsible for the request
      * @return A help text
      */
-    Optional<Text> getHelp(Cause cause, CommandSource source);
+    Optional<Text> getHelp(Cause cause);
 
     /**
      * Gets the usage string of this command.
@@ -167,10 +152,9 @@ public interface Command {
      * <p>The string must not contain the command alias.</p>
      *
      * @param cause The {@link Cause} of the help request
-     * @param source The {@link CommandSource} responsible for the request
      * @return A usage string
      */
-    Text getUsage(Cause cause, CommandSource source);
+    Text getUsage(Cause cause);
 
     /**
      * A high level {@link Builder} for creating a {@link Command}.
@@ -285,39 +269,7 @@ public interface Command {
          * @param executor The {@link CommandExecutor} that will run the command
          * @return This builder, for chaining
          */
-        Builder setExecutor(CommandExecutor<CommandSource> executor);
-
-        /**
-         * Provides the logic of the command, filtering commands based on the
-         * type of {@link CommandSource} executing the .
-         *
-         * <p>Unlike the setExecutor methods, this will chain multiple executors.
-         * Note the following:</p>
-         *
-         * <ul>
-         *     <li>The first call to this will remove any set executors</li>
-         *     <li>Subsequent calls will add executors</li>
-         *     <li>When a command is called, executors will be checked in the
-         *     order they are provided and the first to match will run</li>
-         *     <li>Any call to {@link #setExecutor(CommandExecutor)} will
-         *     remove these executors, and the next call to this will be
-         *     treated as the first call.</li>
-         * </ul>
-         *
-         * @param executor The {@link CommandExecutor} that will run the command
-         * @return This builder, for chaining
-         */
-        <T extends CommandSource> Builder targetedExecutor(CommandExecutor<T> executor, Class<T> sourceType);
-
-        /**
-         * If using {@link #targetedExecutor(CommandExecutor, Class)} to
-         * build up a set of executors, this provides the message to return if no
-         * {@link CommandExecutor}s match when the command is run.
-         *
-         * @param targetedExecutorError The error {@link Text}
-         * @return This builder, for chaining
-         */
-        Builder setTargetedExecutorErrorMessage(Text targetedExecutorError);
+        Builder setExecutor(CommandExecutor executor);
 
         /**
          * Provides the description for this command, which is dependent on the
@@ -330,7 +282,7 @@ public interface Command {
          *      relevant description based on the supplied {@link Cause}
          * @return This builder, for chaining
          */
-        Builder setExtendedDescription(BiFunction<Cause, CommandSource, Optional<Text>> extendedDescriptionFunction);
+        Builder setExtendedDescription(Function<Cause, Optional<Text>> extendedDescriptionFunction);
 
         /**
          * Provides the description for this command.
@@ -345,7 +297,7 @@ public interface Command {
         default Builder setExtendedDescription(@Nullable Text extendedDescription) {
             // Done outside the lambda so that we don't have to recreate the object each time.
             Optional<Text> text = Optional.ofNullable(extendedDescription);
-            return setExtendedDescription((cause, commandSource) -> text);
+            return setExtendedDescription((cause) -> text);
         }
 
         /**
@@ -357,30 +309,19 @@ public interface Command {
         Builder setFlags(Flags flags);
 
         /**
-         * Determines how an argument string should be split.
-         *
-         * <p>Defaults to splitting on spaces, ignoring spaces in quoted
-         * regions.</p>
-         *
-         * @param tokenizer The {@link InputTokenizer} to use
-         * @return This builder, for chaining
-         */
-        Builder setInputTokenizer(InputTokenizer tokenizer);
-
-        /**
          * Provides a simple description for this command, typically no more
          * than one line, which is dependent on the {@link Cause} and the
          * responsible {@link CommandSource} that requests it.
          *
          * <p>Fuller descriptions should be provided through
-         * {@link #setExtendedDescription(BiFunction)}</p>
+         * {@link #setExtendedDescription(Function)}</p>
          *
          * @param descriptionFunction A function that provides a relevant
          *      description based on the supplied {@link Cause} and
          *      {@link CommandSource}
          * @return This builder, for chaining
          */
-        Builder setShortDescription(BiFunction<Cause, CommandSource, Optional<Text>> descriptionFunction);
+        Builder setShortDescription(Function<Cause, Optional<Text>> descriptionFunction);
 
         /**
          * Provides a simple description for this command, typically no more
@@ -396,7 +337,7 @@ public interface Command {
         default Builder setShortDescription(@Nullable Text description) {
             // Done outside the lambda so that we don't have to recreate the object each time.
             Optional<Text> text = Optional.ofNullable(description);
-            return setShortDescription((cause, commandSource) -> text);
+            return setShortDescription((cause) -> text);
         }
 
         /**
@@ -404,39 +345,34 @@ public interface Command {
          * command, or {@code null} if no permission is required.
          *
          * <p>For more control over whether a command can be executed, use
-         * {@link #setExecutionRequirements(BiPredicate)}.</p>
-         *
-         * <p><strong>Note:</strong> this will overwrite any requirements set
-         * using {@link #setExecutionRequirements(BiPredicate)}.</p>
+         * {@link #setExecutionRequirements(Predicate)}. However, note that
+         * setting a permission here will not override anything set in
+         * {@link #setExecutionRequirements(Predicate)}, both will be checked
+         * during execution.</p>
          *
          * @param permission The permission that is required, or {@code null}
          *                   for no permission
          * @return This builder, for chaining
          */
-        default Builder setPermission(@Nullable String permission) {
-            if (permission == null) {
-                return setExecutionRequirements(null);
-            }
-            return setExecutionRequirements((cause, commandSource) -> commandSource.hasPermission(permission));
-        }
+        Builder setPermission(@Nullable String permission);
 
         /**
          * Sets a function that determines what is required of the provided
          * {@link Cause} and {@link CommandSource} before this command executes.
          *
-         * <p><strong>Note:</strong> this will overwrite any requirements set
-         * using {@link #setPermission(String)}.</p>
+         * <p>Any requirements here are in addition to the permission check
+         * from {@link #setPermission(String)}</p>
          *
          * @param executionRequirements A function that sets the
          * @return This builder, for chaining
          */
-        Builder setExecutionRequirements(@Nullable BiPredicate<Cause, CommandSource> executionRequirements);
+        Builder setExecutionRequirements(@Nullable Predicate<Cause> executionRequirements);
 
         /**
          * If this is set to true, then if the parent command (this) has
          * execution requirements (or a permission) set using
          * {@link #setPermission(String)} or
-         * {@link #setExecutionRequirements(BiPredicate)}, then these
+         * {@link #setExecutionRequirements(Predicate)}, then these
          * requirements are required for all children too. If this is set to
          * false, then child commands <em>do not</em> require the set
          * requirements.
@@ -450,7 +386,7 @@ public interface Command {
         Builder setCheckRequirementForChildren(boolean required);
 
         /**
-         * Builds this command, creating a {@link Command} object
+         * Builds this command, creating a {@link Command} object.
          *
          * <p>To build the command, <strong>one</strong> of the following is
          * required:</p>
@@ -471,65 +407,6 @@ public interface Command {
          */
         Command build();
 
-        /**
-         * Builds this command, creating a {@link Command} object, and registers
-         * it with Sponge's {@link CommandManager}.
-         *
-         * <p>To build the command, <strong>one</strong> of the following is
-         * required:</p>
-         *
-         * <ul>
-         *     <li>A {@link CommandExecutor} is provided using
-         *     {@link #setExecutor(CommandExecutor)}</li>
-         *     <li>At least one {@link Command} is set to be a child command
-         *     using {@link #child(Command, Iterable)} or {@link #children(Map)}
-         *     </li>
-         * </ul>
-         *
-         * <p>If these conditions are not fulfilled, an
-         * {@link IllegalStateException} will be thrown.</p>
-         *
-         * @param pluginContainer The {@link PluginContainer} to register the
-         *      command under
-         * @param aliases The aliases to register for the command
-         * @return The {@link CommandMapping} with the registration, or an
-         *      empty optional if no valid aliases were registered
-         * @throws IllegalStateException if the builder is not complete
-         * @throws IllegalArgumentException if an invalid
-         *      {@link PluginContainer} is supplied
-         */
-        default Optional<CommandMapping> buildAndRegister(PluginContainer pluginContainer, String... aliases) {
-            return buildAndRegister(pluginContainer, Lists.newArrayList(aliases));
-        }
-
-        /**
-         * Builds this command, creating a {@link Command} object, and registers
-         * it with Sponge's {@link CommandManager}.
-         *
-         * <p>To build the command, <strong>one</strong> of the following is
-         * required:</p>
-         *
-         * <ul>
-         *     <li>A {@link CommandExecutor} is provided using
-         *     {@link #setExecutor(CommandExecutor)}</li>
-         *     <li>At least one {@link Command} is set to be a child command
-         *     using {@link #child(Command, Iterable)} or {@link #children(Map)}
-         *     </li>
-         * </ul>
-         *
-         * <p>If these conditions are not fulfilled, an
-         * {@link IllegalStateException} will be thrown.</p>
-         *
-         * @param pluginContainer The {@link PluginContainer} to register the
-         *      command under
-         * @param aliases The aliases to register for the command
-         * @return The {@link CommandMapping} with the registration, or an
-         *      empty optional if no valid aliases were registered
-         * @throws IllegalStateException if the builder is not complete
-         * @throws IllegalArgumentException if an invalid
-         *      {@link PluginContainer} is supplied
-         */
-        Optional<CommandMapping> buildAndRegister(PluginContainer pluginContainer, List<String> aliases);
     }
 
 }

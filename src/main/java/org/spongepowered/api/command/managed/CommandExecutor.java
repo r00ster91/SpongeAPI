@@ -35,18 +35,16 @@ import org.spongepowered.api.event.cause.Cause;
  * be executed.
  */
 @FunctionalInterface
-public interface CommandExecutor<T extends CommandSource> {
+public interface CommandExecutor {
 
     /**
      * Callback for the execution of a command.
      *
-     * @param cause The {@link Cause} of this command
-     * @param source The {@link T} who is responsible for executing this command
      * @param context The parsed command arguments for this command
      * @return the result of executing this command
      * @throws CommandException If a user-facing error occurs while
      *     executing this command
      */
-    CommandResult execute(Cause cause, T source, CommandContext context) throws CommandException;
+    CommandResult execute(CommandContext context) throws CommandException;
 
 }

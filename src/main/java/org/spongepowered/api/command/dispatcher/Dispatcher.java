@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 /**
  * Executes a command based on user input.
  */
-public interface Dispatcher extends Command {
+public interface Dispatcher {
 
     /**
      * Gets a list of commands. Each command, regardless of how many aliases it

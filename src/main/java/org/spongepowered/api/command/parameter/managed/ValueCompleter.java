@@ -40,12 +40,11 @@ public interface ValueCompleter {
     /**
      * Gets valid completions for a command.
      *
-     * @param cause The {@link Cause} that requested command completion
      * @param args The {@link ArgumentReader} that contains the unparsed arguments
      * @param context The {@link CommandContext} that contains the parsed arguments
      * @return The {@link List} of completions to display to the client
      * @throws ArgumentParseException if a parameter could not be parsed
      */
-    List<String> complete(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
+    List<String> complete(ArgumentReader args, CommandContext context) throws ArgumentParseException;
 
 }

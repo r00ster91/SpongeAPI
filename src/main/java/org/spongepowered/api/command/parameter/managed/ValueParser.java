@@ -43,12 +43,11 @@ public interface ValueParser<T> {
      * <p>This should have no side effects on anything except on the state of
      * the {@link ArgumentReader}.</p>
      *
-     * @param cause The {@link Cause} that caused this command
      * @param args The {@link ArgumentReader} that contains the unparsed arguments
      * @param context The {@link CommandContext} containing the state about this command
      * @return Returns the value(s), usually from {@link ArgumentReader#next()}
      * @throws ArgumentParseException if a parameter could not be parsed
      */
-    Optional<T> getValue(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
+    Optional<T> getValue(ArgumentReader args, CommandContext context) throws ArgumentParseException;
 
 }

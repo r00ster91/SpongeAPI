@@ -36,10 +36,10 @@ public interface ValueUsage {
     /**
      * Gets the usage string for the argument.
      *
-     * @param key The {@link Text} that defines the parameter key
      * @param cause The {@link Cause} requesting the usage
+     * @param key The {@link Text} that defines the parameter key
      * @return The usage
      */
-    Text getUsage(Text key, Cause cause);
+    Text getUsage(Cause cause, Text key);
 
 }

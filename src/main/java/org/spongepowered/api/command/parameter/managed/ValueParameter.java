@@ -35,12 +35,12 @@ import java.util.function.Function;
 public interface ValueParameter<T> extends ValueCompleter, ValueParser<T>, ValueUsage, SelectorParser {
 
     @Override
-    default Text getUsage(Text key, Cause cause) {
+    default Text getUsage(Cause cause, Text key) {
         return key;
     }
 
     @Override
-    default Optional<T> parseSelector(Cause cause, String selector, CommandContext context, Function<Text, ArgumentParseException> errorFunction)
+    default Optional<T> parseSelector(String selector, CommandContext context, Function<Text, ArgumentParseException> errorFunction)
             throws ArgumentParseException {
         return Optional.empty();
     }

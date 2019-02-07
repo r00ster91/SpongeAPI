@@ -50,7 +50,6 @@ public interface SelectorParser {
      * will cause the associated {@link ValueParser} to attempt to parse the
      * selector.</p>
      *
-     * @param cause The {@link Cause}
      * @param selector The selector, which will include the "@" symbol
      * @param context The {@link CommandContext}
      * @param errorFunction A {@link Function} that produces an
@@ -60,6 +59,6 @@ public interface SelectorParser {
      *      {@link Optional#empty()} if a selector should not be parsed.
      * @throws ArgumentParseException if the selector could not be parsed
      */
-    Optional<?> parseSelector(Cause cause, String selector, CommandContext context, Function<Text, ArgumentParseException> errorFunction)
+    Optional<?> parseSelector(String selector, CommandContext context, Function<Text, ArgumentParseException> errorFunction)
             throws ArgumentParseException;
 }
