@@ -24,7 +24,7 @@
  */
 package org.spongepowered.api.command.exception;
 
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.text.Text;
 
 /**

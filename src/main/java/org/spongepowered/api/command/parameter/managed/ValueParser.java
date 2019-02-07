@@ -24,9 +24,9 @@
  */
 package org.spongepowered.api.command.parameter.managed;
 
-import org.spongepowered.api.command.parameter.ArgumentParseException;
+import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.CommandContext;
-import org.spongepowered.api.command.parameter.token.CommandArgs;
+import org.spongepowered.api.command.parameter.token.ArgumentReader;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.util.Optional;
@@ -41,14 +41,14 @@ public interface ValueParser<T> {
      * Gets the value for the parameter. This may return more than one value.
      *
      * <p>This should have no side effects on anything except on the state of
-     * the {@link CommandArgs}.</p>
+     * the {@link ArgumentReader}.</p>
      *
      * @param cause The {@link Cause} that caused this command
-     * @param args The {@link CommandArgs} that contains the unparsed arguments
+     * @param args The {@link ArgumentReader} that contains the unparsed arguments
      * @param context The {@link CommandContext} containing the state about this command
-     * @return Returns the value(s), usually from {@link CommandArgs#next()}
+     * @return Returns the value(s), usually from {@link ArgumentReader#next()}
      * @throws ArgumentParseException if a parameter could not be parsed
      */
-    Optional<T> getValue(Cause cause, CommandArgs args, CommandContext context) throws ArgumentParseException;
+    Optional<T> getValue(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
 
 }

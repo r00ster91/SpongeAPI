@@ -25,9 +25,9 @@
 package org.spongepowered.api.command.parameter.flag;
 
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.command.parameter.ArgumentParseException;
+import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.CommandContext;
-import org.spongepowered.api.command.parameter.token.CommandArgs;
+import org.spongepowered.api.command.parameter.token.ArgumentReader;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.annotation.CatalogedBy;
 
@@ -39,18 +39,18 @@ import org.spongepowered.api.util.annotation.CatalogedBy;
 public interface UnknownFlagBehavior extends CatalogType {
 
     /**
-     * Parses the unknown flag. the {@link CommandArgs} and
+     * Parses the unknown flag. the {@link ArgumentReader} and
      * {@link CommandContext} are in the post flag-parse position, but
      * this can be reverted with the provided states.
      *
-     * <p>This method should leave/put the {@link CommandArgs} and
+     * <p>This method should leave/put the {@link ArgumentReader} and
      * {@link CommandContext} in the state ready to parse the next
      * element.</p>
      *
      * @param cause The {@link Cause} that requested the command
-     * @param args The {@link CommandArgs}
+     * @param args The {@link ArgumentReader}
      * @param context The {@link CommandContext}
-     * @param tokenizedArgsPreviousState The previous {@link CommandArgs}
+     * @param tokenizedArgsPreviousState The previous {@link ArgumentReader}
      *                                   state
      * @param contextPreviousState The previous {@link CommandContext}
      *                             state
@@ -58,6 +58,6 @@ public interface UnknownFlagBehavior extends CatalogType {
      * @throws ArgumentParseException thrown if there is an issue parsing the
      *                                 argument
      */
-    void parse(Cause cause, CommandArgs args, CommandContext context, CommandArgs.State tokenizedArgsPreviousState,
+    void parse(Cause cause, ArgumentReader args, CommandContext context, ArgumentReader.State tokenizedArgsPreviousState,
             CommandContext.State contextPreviousState, String flag) throws ArgumentParseException;
 }

@@ -25,6 +25,8 @@
 package org.spongepowered.api.command.parameter.managed.standard;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -287,6 +289,44 @@ public final class CatalogedValueParameters {
      */
     public static final CatalogedValueParameter<String> STRING =
             DummyObjectProvider.createExtendedFor(CatalogedValueParameter.class, "STRING");
+
+    /**
+     * Does not parse any arguments, but instead returns a
+     * {@link org.spongepowered.api.block.BlockSnapshot} if the
+     * current {@link CommandSource} (which thus
+     * must be a {@link org.spongepowered.api.world.Locatable}).
+     *
+     * <p>This will always fail for non-locatable sources</p>
+     *
+     * <p>Returns a {@link org.spongepowered.api.block.BlockSnapshot}.</p>
+     */
+    public static final CatalogedValueParameter<BlockSnapshot> TARGET_BLOCK =
+            DummyObjectProvider.createExtendedFor(CatalogedValueParameter.class, "TARGET_BLOCK");
+
+    /**
+     * Does not parse any arguments, but instead returns a
+     * {@link org.spongepowered.api.entity.Entity} if the
+     * current {@link CommandSource} (which thus
+     * must be a {@link org.spongepowered.api.world.Locatable}).
+     *
+     * <p>This will always fail for non-locatable sources</p>
+     *
+     * <p>Returns a {@link org.spongepowered.api.entity.Entity}.</p>
+     */
+    public static final CatalogedValueParameter<Entity> TARGET_ENTITY =
+            DummyObjectProvider.createExtendedFor(CatalogedValueParameter.class, "TARGET_ENTITY");
+
+    /**
+     * Does not parse any arguments, but instead returns a {@link Player} if the
+     * current {@link CommandSource} (which thus
+     * must be a {@link org.spongepowered.api.world.Locatable}).
+     *
+     * <p>This will always fail for non-locatable sources</p>
+     *
+     * <p>Returns a {@link Player}.</p>
+     */
+    public static final CatalogedValueParameter<Player> TARGET_PLAYER =
+            DummyObjectProvider.createExtendedFor(CatalogedValueParameter.class, "TARGET_PLAYER");
 
     /**
      * Expects an argument to represent some {@link Text} serialised using formatting codes.

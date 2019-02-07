@@ -53,7 +53,7 @@ public interface CommandResult {
      * @return The {@link CommandResult}
      */
     static CommandResult success() {
-        return builder().successCount(1).build();
+        return CommandResults.SUCCESS;
     }
 
     /**
@@ -62,7 +62,7 @@ public interface CommandResult {
      * @return The {@link CommandResult}
      */
     static CommandResult empty() {
-        return builder().build();
+        return CommandResults.EMPTY;
     }
 
     /**
@@ -77,89 +77,18 @@ public interface CommandResult {
     }
 
     /**
-     * Returns a result indicating the command was processed with an
-     * amount of affected blocks.
+     * Gets whether the command executed successfully.
      *
-     * @param count The amount of blocks affected
-     * @return The result
+     * @return {@code true} if so.
      */
-    static CommandResult withAffectedBlocks(int count) {
-        return builder().affectedBlocks(count).build();
-    }
+    boolean isSuccess();
 
     /**
-     * Returns a result indicating the command was processed with an
-     * amount of affected entities.
+     * Gets the integer result returned by the command that executed.
      *
-     * @param count The amount of entities affected
-     * @return The result
+     * @return The result.
      */
-    static CommandResult withAffectedEntities(int count) {
-        return builder().affectedEntities(count).build();
-    }
-
-    /**
-     * Returns a result indicating the command was processed with an
-     * amount of affected items.
-     *
-     * @param count The amount of items affected
-     * @return The result
-     */
-    static CommandResult withAffectedItems(int count) {
-        return builder().affectedItems(count).build();
-    }
-
-    /**
-     * Returns a result indicating the command was processed with an
-     * amount of queries.
-     *
-     * @param count The amount of queries
-     * @return The result
-     */
-    static CommandResult withQueryResult(int count) {
-        return builder().queryResult(count).build();
-    }
-
-    Optional<Text> getErrorMessage();
-
-    /**
-     * Gets the success count of the command.
-     *
-     * @return The success count of the command
-     */
-    OptionalInt successCount();
-
-    /**
-     * Gets the number of blocks affected by the command.
-     *
-     * @return The number of blocks affected by the command, if such a count
-     *         exists
-     */
-    OptionalInt affectedBlocks();
-
-    /**
-     * Gets the number of entities affected by the command.
-     *
-     * @return The number of entities affected by the command, if such a count
-     *         exists
-     */
-    OptionalInt affectedEntities();
-
-    /**
-     * Gets the number of items affected by the command.
-     *
-     * @return The number of items affected by the command, if such a count
-     *         exists
-     */
-    OptionalInt affectedItems();
-
-    /**
-     * Gets the query result of the command, e.g. the time of the day,
-     * an amount of money or a player's amount of XP.
-     *
-     * @return The query result of the command, if one exists
-     */
-    OptionalInt queryResult();
+    int getResult();
 
     /**
      * Builds {@link CommandResult}s.
@@ -167,46 +96,20 @@ public interface CommandResult {
     interface Builder extends ResettableBuilder<CommandResult, Builder> {
 
         /**
-         * Sets if the command has been processed.
+         * Sets an integer value that indicates the states of the
+         * command.
          *
-         * @param successCount If the command has been processed
+         * <ul>
+         *     <li>A positive value indicates successful execution,</li>
+         *     <li>Zero indicates the command didn't fulfil its task</li>
+         *     <li>A negative value is undefined in the API, if returned, the
+         *     effects are implementation specific.</li>
+         * </ul>
+         *
+         * @param result The integer result to set
          * @return This builder, for chaining
          */
-        Builder successCount(@Nullable Integer successCount);
-
-        /**
-         * Sets the amount of blocks affected by the command.
-         *
-         * @param affectedBlocks The amount of blocks affected by the command
-         * @return This builder, for chaining
-         */
-        Builder affectedBlocks(@Nullable Integer affectedBlocks);
-
-        /**
-         * Sets the amount of entities affected by the command.
-         *
-         * @param affectedEntities The amount of entities affected by the
-         *     command
-         * @return This builder, for chaining
-         */
-        Builder affectedEntities(@Nullable Integer affectedEntities);
-
-        /**
-         * Sets the amount of items affected by the command.
-         *
-         * @param affectedItems The amount of items affected by the command
-         * @return This builder, for chaining
-         */
-        Builder affectedItems(@Nullable Integer affectedItems);
-
-        /**
-         * Sets the query result of the command, e.g. the time of the day,
-         * an amount of money or a player's amount of XP.
-         *
-         * @param queryResult The query result of the command
-         * @return This builder, for chaining
-         */
-        Builder queryResult(@Nullable Integer queryResult);
+        Builder setResult(int result);
 
         /**
          * Sets or unsets the error message to return to the user without

@@ -27,16 +27,17 @@ package org.spongepowered.api.command.parameter;
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.source.CommandSource;
+import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.managed.SelectorParser;
 import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 import org.spongepowered.api.command.parameter.managed.ValueParameter;
 import org.spongepowered.api.command.parameter.managed.ValueParser;
 import org.spongepowered.api.command.parameter.managed.ValueUsage;
 import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
-import org.spongepowered.api.command.parameter.managed.standard.OptionalParameterFlag;
 import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
-import org.spongepowered.api.command.parameter.token.CommandArgs;
+import org.spongepowered.api.command.parameter.token.ArgumentReader;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -56,7 +57,6 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URL;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,9 +81,25 @@ public interface Parameter {
      *
      * @return The {@link Value.Builder}
      */
-    // TODO: better?
     static <T> Value.Builder<T> builder(ValueParser<T> parser) {
-        return ((Value.Builder<?>) Sponge.getRegistry().createBuilder(Value.Builder.class)).setParser(parser);
+        return ((Value.Builder<T>) Sponge.getRegistry().createBuilder(Value.Builder.class));
+    }
+
+    /**
+     * Gets a {@link Parameter} that represents a subcommand.
+     *
+     * @param subcommand The {@link Command} to execute
+     * @param alias The first alias of the subcommand
+     * @param aliases Subsequent aliases, if any
+     * @return The {@link Subcommand} for use in a {@link Parameter} chain
+     */
+    static Subcommand subcommand(Command subcommand, String alias, String... aliases) {
+        Subcommand.Builder builder = Sponge.getRegistry().createBuilder(Subcommand.Builder.class).setSubcommand(subcommand).alias(alias);
+        for (String a : aliases) {
+            builder.alias(a);
+        }
+
+        return builder.build();
     }
 
     /**
@@ -294,9 +310,8 @@ public interface Parameter {
      *
      * @return A {@link Parameter.Value.Builder}
      */
-    // TODO: Entity Target
     static Parameter.Value.Builder entityOrTarget() {
-        return entity();
+        return Parameter.builder(CatalogedValueParameters.ENTITY).parser(CatalogedValueParameters.TARGET_ENTITY);
     }
 
     /**
@@ -418,9 +433,8 @@ public interface Parameter {
      *
      * @return A {@link Parameter.Value.Builder}
      */
-    // TODO: Sort out target part
     static Parameter.Value.Builder<Player> playerOrTarget() {
-        return player();
+        return Parameter.builder(CatalogedValueParameters.PLAYER).parser(CatalogedValueParameters.TARGET_PLAYER);
     }
 
     /**
@@ -643,20 +657,20 @@ public interface Parameter {
      * Parses the next element(s) in the {@link CommandContext}
      *
      * @param cause The {@link Cause} requesting execution of this command
-     * @param args The {@link CommandArgs} containing the strings that need
+     * @param args The {@link ArgumentReader} containing the strings that need
      *             to be parsed
      * @param context The {@link CommandContext} that contains the
      *                current state of the execution
      * @throws ArgumentParseException thrown if the parameter could not be
      *      parsed
      */
-    void parse(Cause cause, CommandArgs args, CommandContext context) throws ArgumentParseException;
+    void parse(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
 
     /**
      * Returns potential completions of the current tokenized argument.
      *
      * @param cause The {@link Cause} requesting execution of this command
-     * @param args The {@link CommandArgs} containing the strings that need
+     * @param args The {@link ArgumentReader} containing the strings that need
      *             to be parsed
      * @param context The {@link CommandContext} that contains the
      *                current state of the execution.
@@ -664,7 +678,7 @@ public interface Parameter {
      * @throws ArgumentParseException thrown if the parameter could not be
      *      parsed
      */
-    List<String> complete(Cause cause, CommandArgs args, CommandContext context) throws ArgumentParseException;
+    List<String> complete(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
 
     /**
      * Gets the usage of this parameter.
@@ -675,44 +689,17 @@ public interface Parameter {
     Text getUsage(Cause cause);
 
     /**
-     * Represents a set of {@link Parameter}s to try to parse an argument.
+     * Represents a {@link Parameter} that attempts to parse an argument to
+     * obtain a value of type {@link T}.
      *
-     * @param <T> The type of value that is returned.
-     */
-    interface ValueGroup<T> extends Parameter {
-
-        /**
-         * Gets the key associated with this parameter. This key will override
-         * child parameter keys.
-         *
-         * @return The key.
-         */
-        Text key();
-
-        /**
-         * The {@link Value}s to use when parsing an argument. They will be
-         * tried in this order.
-         *
-         * @return The parameters.
-         */
-        Collection<ValueParser<? extends T>> parametersToTry();
-
-        Optional<ValueCompleter> completer();
-
-        interface Builder<T> extends ResettableBuilder<ValueGroup<T>, Builder<T>> {
-
-            Builder<T> valueParser(ValueParser<? extends T> parser);
-
-            Builder<T> setCompleter(ValueCompleter completer);
-
-            ValueGroup<T> build();
-        }
-    }
-
-    /**
-     * Represents a {@link Parameter} that returns a value from an argument.
+     * <p>This type of {@link Parameter} will attempt to parse an input
+     * using the {@link ValueParser}s in the order that they are returned in
+     * {@link #getParsers()}. If a {@link ValueParser} fails to parse an
+     * argument, the next in the list will be tried, if the final
+     * {@link ValueParser} cannot parse the argument, this element will
+     * throw a {@link ArgumentParseException}.</p>
      *
-     * @param <T> The type of value that is returned.
+     * @param <T> The type of value returned from the {@link ValueParser}s
      */
     interface Value<T> extends Parameter {
 
@@ -721,21 +708,27 @@ public interface Parameter {
          *
          * @return The key.
          */
-        Text key();
+        String key();
 
         /**
-         * Gets the {@link ValueParser} associated with this {@link Value}
+         * The {@link ValueParser}s to use when parsing an argument. They will be
+         * tried in this order.
          *
-         * @return The {@link ValueParser}.
+         * <p>There must always be at least one {@link ValueParser}. If this element
+         * is optional and has a default result, it will be the last element in the
+         * returned {@link Collection}.</p>
+         *
+         * @return The parameters.
          */
-        ValueParser<T> getParser();
+        Collection<ValueParser<? extends T>> getParsers();
 
         /**
-         * Gets the {@link ValueCompleter} associated with this {@link Value}
+         * Gets the {@link ValueCompleter} associated with this {@link Value},
+         * if any.
          *
          * @return The {@link ValueCompleter}.
          */
-        ValueCompleter getCompleter();
+        Optional<ValueCompleter> getCompleter();
 
         /**
          * Builds a {@link Parameter} from constituent components.
@@ -745,24 +738,12 @@ public interface Parameter {
             /**
              * The key that the parameter will place parsed values into.
              *
-             * <p>Mandatory</p>
+             * <p>This is a mandatory element.</p>
              *
              * @param key The key.
              * @return This builder, for chaining
              */
-            default Builder setKey(String key) {
-                return setKey(Text.of(key));
-            }
-
-            /**
-             * The key that the parameter will place parsed values into.
-             *
-             * <p>Mandatory</p>
-             *
-             * @param key The key.
-             * @return This builder, for chaining
-             */
-            Builder<T> setKey(Text key);
+            Builder<T> setKey(String key);
 
             /**
              * The {@link ValueParser} that will extract the value(s) from the
@@ -774,14 +755,14 @@ public interface Parameter {
              * @param parser The {@link ValueParameter} to use
              * @return This builder, for chaining
              */
-            <S> Builder<S> setParser(ValueParser<? extends S> parser);
+            Builder<T> parser(ValueParser<? extends T> parser);
 
             /**
              * Provides a function that provides tab completions
              *
              * <p>Optional. If this is <code>null</code> (or never set),
              * completions will either be done via the supplied
-             * {@link #setParser(ValueParser)} or will just return an empty
+             * {@link #parser(ValueParser)} or will just return an empty
              * list. If this is supplied, no modifiers will run on completion.</p>
              *
              * @param completer The {@link ValueCompleter}
@@ -795,7 +776,7 @@ public interface Parameter {
              *
              * <p>Optional. If this is <code>null</code> (or never set),
              * the usage string will either be provided via the supplied
-             * {@link #setParser(ValueParser)} or will just return
+             * {@link #parser(ValueParser)} or will just return
              * the parameter's key. If this is supplied, no modifiers will run on
              * usage.</p>
              *
@@ -823,8 +804,8 @@ public interface Parameter {
              *
              * <p>If the source does not have this permission, this parameter
              * will simply be skipped. Consider combining this with
-             * the {@link #optional(OptionalParameterFlag)} flag,
-             * so that those with permission can also skip this parameter.</p>
+             * {@link #optional()} so that those with permission can also skip
+             * this parameter.</p>
              *
              * @param permission The permission to check for, or {@code null} for
              *                   no check.
@@ -842,8 +823,8 @@ public interface Parameter {
              * {@link Cause} and {@link CommandSource} before this parameter
              * attempts to parse.
              *
-             * <p>If this is set to null, this paramter will always attempt to parse,
-             * subject to other modifiers.</p>
+             * <p>If this is set to {@code null}, this parameter will always
+             * attempt to parse, subject to other modifiers.</p>
              *
              * <p><strong>Note:</strong> this will overwrite any requirements set
              * using {@link #setRequiredPermission(String)}}.</p>
@@ -854,47 +835,52 @@ public interface Parameter {
             Builder<T> setRequirements(@Nullable BiPredicate<Cause, CommandSource> executionRequirements);
 
             /**
-             * Adds a check to ensure that only one value is in the context under
-             * this parameter's key. If there are more than one, or zero, an
-             * {@link ArgumentParseException} will be thrown.
+             * If set, this parameter will repeat until the argument string has
+             * been parsed.
+             *
+             * <p>For example, if you have the argument string,</p>
+             *
+             * <pre>
+             *     1 2 3 4
+             * </pre>
+             *
+             * <p>and you use {@link CatalogedValueParameters#INTEGER} without
+             * setting this method, this parameter will parse the first element,
+             * 1, and the remaining elements will be left for the next parameter
+             * in the chain. If you call this method, the resulting
+             * {@link Parameter.Value} will continuously parse the argument string
+             * until either:</p>
+             * <ul>
+             *     <li>The entire argument string has been parsed, in which case
+             *     the parsing is considered complete and command execution will
+             *     continue</li>
+             *     <li>A part of the argument string could not be parsed, in which
+             *     case an exception will be raised. If this element is also marked
+             *     as {@link #optional()} or with one of the
+             *     {@link #orDefault(Object)} methods, then parsing will continue
+             *     as if nothing has been parsed.</li>
+             * </ul>
+             *
+             * <p>Unless marked as optional, this element must be able to consume
+             * at least one argument.</p>
              *
              * @return This builder, for chaining
              */
-            Builder<T> onlyOne();
+            Builder<T> consumeAllRemaining();
 
             /**
-             * Indicates that the parameter should iterate over and parse all
-             * remaining elements in the provided set of arguments.
+             * Marks this parameter as optional, such that if an argument does not
+             * exist <em>or</em> cannot be parsed, an exception is not thrown, and
+             * no value is returned.
              *
              * @return This builder, for chaining
              */
-            Builder<T> allOf();
-
-            /**
-             * Requires the parameter to be provided a certain number of times.
-             *
-             * @param times The number of times to repeat this parameter
-             * @return This builder, for chaining
-             */
-            Builder<T> repeated(int times);
-
-            /**
-             * Sets whether this parameter is optional.
-             *
-             * <p>If {@link #orDefault(Object)}</p>
-             *
-             * @param optionalFlag The {@link OptionalParameterFlag}
-             * @return This builder, for chaining
-             */
-            Builder<T> optional(OptionalParameterFlag optionalFlag);
+            Builder<T> optional();
 
             /**
              * Marks this parameter as optional, such that if an argument does not
              * exist <em>or</em> cannot be parsed, an exception is not thrown, and
              * the value provided is inserted into the context instead.
-             *
-             * <p>This will replace the option set in
-             * {@link #optional(OptionalParameterFlag)}</p>
              *
              * @param defaultValue The default value if this parameter does not
              *                     enter a value into the {@link CommandContext}
@@ -915,9 +901,6 @@ public interface Parameter {
              * parser will attempt to parse the argument this element couldn't
              * parse using the next parser in the chain.</p>
              *
-             * <p>This will replace the option set in
-             * {@link #optional(OptionalParameterFlag)}</p>
-             *
              * @param defaultValueSupplier A {@link Supplier} that returns an object
              *                             to insert into the context if this
              *                             parameter cannot parse the argument. If
@@ -935,13 +918,6 @@ public interface Parameter {
              * parameter's key, otherwise, an {@link ArgumentParseException} is
              * thrown.
              *
-             * <p>If a default value is inserted into the context, the command
-             * parser will attempt to parse the argument this element couldn't
-             * parse using the next parser in the chain.</p>
-             *
-             * <p>This will replace the option set in
-             * {@link #optional(OptionalParameterFlag)}</p>
-             *
              * @param defaultValueFunction A {@link Function} that returns an object
              *                             to insert into the context if this
              *                             parameter cannot parse the argument. If
@@ -958,6 +934,55 @@ public interface Parameter {
              * @return The {@link Parameter}
              */
             Parameter.Value<T> build();
+
+        }
+
+    }
+
+    /**
+     * A {@link Subcommand} represents a literal argument where, if parsed, should
+     * indicate to the command processor that the
+     * {@link org.spongepowered.api.command.managed.CommandExecutor} of the command
+     * should change.
+     */
+    interface Subcommand extends Parameter {
+
+        /**
+         * The command that is parsed and potentially run when this subcommand
+         * is parsed.
+         *
+         * @return The command to run.
+         */
+        Command getCommand();
+
+        interface Builder extends ResettableBuilder<Subcommand, Builder> {
+
+            /**
+             * Sets an alias for the subcommand. This can be executed more
+             * than once.
+             *
+             * @param alias The alias
+             * @return This builder, for chaining
+             */
+            Builder alias(String alias);
+
+            /**
+             * Sets the {@link Command} to execute for this subcommand.
+             *
+             * @param command The {@link Command}
+             * @return This builder, for chaining.
+             */
+            Builder setSubcommand(Command command);
+
+            /**
+             * Builds this subcommand parameter.
+             *
+             * <p>An alias and the command must be set, else a
+             * {@link IllegalStateException} will be thrown.</p>
+             *
+             * @return The {@link Subcommand}
+             */
+            Subcommand build();
 
         }
 

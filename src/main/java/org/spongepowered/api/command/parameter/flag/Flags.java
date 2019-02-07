@@ -25,10 +25,10 @@
 package org.spongepowered.api.command.parameter.flag;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.parameter.ArgumentParseException;
+import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.parameter.token.CommandArgs;
+import org.spongepowered.api.command.parameter.token.ArgumentReader;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ResettableBuilder;
@@ -41,9 +41,9 @@ import org.spongepowered.api.util.ResettableBuilder;
  * optionally be followed by a value (--flag [value], -f [value] or -f[value])
  * </p>
  *
- * <p>Flags can be specified anywhere in a command, unless
- * {@link Builder#setAnchorFlags(boolean)} is set to true, in which case, flags
- * can only be set at the beginning of an argument set.</p>
+ * <p>Flags can always be specified at the beginning of a command. Some
+ * implementations may allow for flags to be specified elsewhere, but this
+ * is not guaranteed.</p>
  */
 public interface Flags extends Parameter {
 
@@ -59,7 +59,7 @@ public interface Flags extends Parameter {
     /**
      * Attempts to parse the next element using these flags.
      *
-     * <p>If the next element is not a flag, the states of {@link CommandArgs}
+     * <p>If the next element is not a flag, the states of {@link ArgumentReader}
      * and {@link CommandContext} will not change. If the next element
      * is not a <em>recognized</em> flag, but could be a flag, it will be parsed
      * in accordance with the {@link UnknownFlagBehavior} supplied (or
@@ -73,11 +73,11 @@ public interface Flags extends Parameter {
      * </ul>
      *
      * @param cause The {@link Cause} of the request
-     * @param args The {@link CommandArgs}
+     * @param args The {@link ArgumentReader}
      * @param context The {@link CommandContext}
      * @throws ArgumentParseException thrown if a flag could not be parsed
      */
-    void parse(Cause cause, CommandArgs args, CommandContext context) throws ArgumentParseException;
+    void parse(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
 
     /**
      * Gets the usage for the flag potion of the command.
@@ -173,16 +173,6 @@ public interface Flags extends Parameter {
          * @return This builder, for chaining
          */
         Builder setUnknownShortFlagBehavior(UnknownFlagBehavior behavior);
-
-        /**
-         * Whether flags should be anchored to the beginning of the text (so
-         * flags will only be picked up if they are at the beginning of the
-         * input).
-         *
-         * @param anchorFlags Whether flags are anchored
-         * @return This builder, for chaining
-         */
-        Builder setAnchorFlags(boolean anchorFlags);
 
         /**
          * Builds a {@link Flags} object.

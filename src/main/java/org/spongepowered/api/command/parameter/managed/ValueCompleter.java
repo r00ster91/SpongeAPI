@@ -24,9 +24,9 @@
  */
 package org.spongepowered.api.command.parameter.managed;
 
-import org.spongepowered.api.command.parameter.ArgumentParseException;
+import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.CommandContext;
-import org.spongepowered.api.command.parameter.token.CommandArgs;
+import org.spongepowered.api.command.parameter.token.ArgumentReader;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.util.List;
@@ -41,11 +41,11 @@ public interface ValueCompleter {
      * Gets valid completions for a command.
      *
      * @param cause The {@link Cause} that requested command completion
-     * @param args The {@link CommandArgs} that contains the unparsed arguments
+     * @param args The {@link ArgumentReader} that contains the unparsed arguments
      * @param context The {@link CommandContext} that contains the parsed arguments
      * @return The {@link List} of completions to display to the client
      * @throws ArgumentParseException if a parameter could not be parsed
      */
-    List<String> complete(Cause cause, CommandArgs args, CommandContext context) throws ArgumentParseException;
+    List<String> complete(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
 
 }

@@ -24,8 +24,6 @@
  */
 package org.spongepowered.api.command.source;
 
-import org.spongepowered.api.command.CommandSource;
-
 /**
  * Represents the server console.
  */

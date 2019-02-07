@@ -24,17 +24,16 @@
  */
 package org.spongepowered.api.command.parameter.token;
 
-import org.spongepowered.api.command.parameter.ArgumentParseException;
+import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Holds the tokenized arguments from a command, ready to be consumed and
- * parsed.
+ * Reads arguments from a string and parses them.
  */
-public interface CommandArgs {
+public interface ArgumentReader {
 
     /**
      * Returns whether there is another argument to parse.
@@ -172,7 +171,7 @@ public interface CommandArgs {
     String rawArgsFromCurrentPosition();
 
     /**
-     * An immutable snapshot of a {@link CommandArgs}.
+     * An immutable snapshot of a {@link ArgumentReader}.
      *
      * <p>No assumptions should be made about the form of this state object,
      * it is not defined in the API and may change at any time.</p>

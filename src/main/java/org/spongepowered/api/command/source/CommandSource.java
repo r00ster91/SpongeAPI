@@ -22,30 +22,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.command.parameter.token;
+package org.spongepowered.api.command.source;
 
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.command.parameter.ArgumentParseException;
-import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.util.annotation.CatalogedBy;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.text.translation.locale.Locales;
 
-import java.util.List;
+import java.util.Locale;
 
 /**
- * Provides a function to transform raw strings into tokens, which can be
- * consumed by {@link Parameter}s.
+ * Something that traditionally executes commands, can receive messages and
+ * can have permissions associated with them.
+ *
+ * <p>Examples of potential implementations include players, the server console,
+ * Rcon clients, web-based clients, command blocks, and so on.</p>
  */
-@CatalogedBy(InputTokenizers.class)
-public interface InputTokenizer extends CatalogType {
+public interface CommandSource extends MessageReceiver, Subject {
 
     /**
-     * Take the input string and split it as appropriate into argument tokens.
+     * Gets the name identifying this command source.
      *
-     * @param arguments The provided arguments
-     * @param lenient Whether to parse leniently
-     * @return The tokenized strings. Empty list if error occurs
-     * @throws ArgumentParseException if an invalid input is provided
+     * @return The name of this command source
      */
-    List<SingleArg> tokenize(String arguments, boolean lenient) throws ArgumentParseException;
+    String getName();
+
+    /**
+     * Gets the locale used by this command source. If this
+     * {@link CommandSource} does have a {@link Locale} configured or does not
+     * support configuring a {@link Locale}, {@link Locales#DEFAULT} is used.
+     *
+     * @return The locale used by this command source
+     */
+    default Locale getLocale() {
+        return Locales.DEFAULT;
+    }
 
 }

@@ -448,5 +448,7 @@ public class VariableValueParameters {
          *             been specified
          */
         ValueParameter<Text> build() throws IllegalStateException;
+
     }
+
 }

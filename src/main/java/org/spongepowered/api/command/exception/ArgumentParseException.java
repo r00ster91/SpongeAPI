@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.command.parameter;
+package org.spongepowered.api.command.exception;
 
 import com.google.common.base.Strings;
-import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.text.Text;
 
 /**
@@ -72,7 +72,7 @@ public class ArgumentParseException extends CommandException {
         } else if (superText == null) {
             return Text.of(getAnnotatedPosition());
         } else {
-            return Text.of(superText, Text.NEW_LINE, getAnnotatedPosition());
+            return Text.of(superText, Text.newLine(), getAnnotatedPosition());
         }
     }
 

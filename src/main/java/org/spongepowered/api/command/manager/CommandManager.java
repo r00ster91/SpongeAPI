@@ -26,7 +26,7 @@ package org.spongepowered.api.command.manager;
 
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.command.dispatcher.Dispatcher;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.event.CauseStackManager;

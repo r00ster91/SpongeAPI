@@ -24,7 +24,7 @@
  */
 package org.spongepowered.api.command.parameter.flag;
 
-import org.spongepowered.api.command.parameter.ArgumentParseException;
+import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 public final class UnknownFlagBehaviors {
