@@ -24,25 +24,14 @@
  */
 package org.spongepowered.api.command.parameter.managed;
 
-import org.spongepowered.api.command.exception.ArgumentParseException;
-import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.text.Text;
 
-import java.util.Optional;
-import java.util.function.Function;
-
-public interface ValueParameter<T> extends ValueCompleter, ValueParser<T>, ValueUsage, SelectorParser {
+public interface ValueParameter<T> extends ValueCompleter, ValueParser<T>, ValueUsage {
 
     @Override
     default Text getUsage(Cause cause, Text key) {
         return key;
-    }
-
-    @Override
-    default Optional<T> parseSelector(String selector, CommandContext context, Function<Text, ArgumentParseException> errorFunction)
-            throws ArgumentParseException {
-        return Optional.empty();
     }
 
 }

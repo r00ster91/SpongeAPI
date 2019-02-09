@@ -30,7 +30,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.command.exception.ArgumentParseException;
-import org.spongepowered.api.command.parameter.managed.SelectorParser;
 import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 import org.spongepowered.api.command.parameter.managed.ValueParameter;
 import org.spongepowered.api.command.parameter.managed.ValueParser;
@@ -784,19 +783,6 @@ public interface Parameter {
              * @return This builder, for chaining
              */
             Builder<T> setUsage(@Nullable ValueUsage usage);
-
-            /**
-             * Sets the {@link SelectorParser} that is used to parse a selector if
-             * one is provided.
-             *
-             * <p>This will <em>replace</em> any selector parser that may be on any
-             * supplied {@link ValueParameter}. Set this to {@code null} to define
-             * the default for the parameter</p>
-             *
-             * @param selectorParser The parser
-             * @return This builder, for chaining
-             */
-            Builder<T> setSelectorParser(@Nullable SelectorParser selectorParser);
 
             /**
              * Sets the permission that the executing {@link CommandSource} is
