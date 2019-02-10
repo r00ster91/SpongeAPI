@@ -76,12 +76,33 @@ import javax.annotation.Nullable;
 public interface Parameter {
 
     /**
+     * Creates a {@link Parameter.Key} for storing values against.
+     *
+     * @param key The string key
+     * @param valueClass The type of value that this key represents
+     * @param <T> The type
+     * @return The {@link Key}
+     */
+    static <T> Key<T> key(String key, Class<T> valueClass) {
+        return Sponge.getRegistry().createBuilder(Key.Builder.class).build(key, valueClass);
+    }
+
+    /**
      * Gets a builder that builds a {@link Parameter.Value}.
      *
      * @return The {@link Value.Builder}
      */
-    static <T> Value.Builder<T> builder(ValueParser<T> parser) {
-        return ((Value.Builder<T>) Sponge.getRegistry().createBuilder(Value.Builder.class));
+    static <T> Value.Builder<T> builder(Class<T> valueClass) {
+        return ((Value.Builder<T>) Sponge.getRegistry().createBuilder(Value.Builder.class)).setValueClass(valueClass);
+    }
+
+    /**
+     * Gets a builder that builds a {@link Parameter.Value}.
+     *
+     * @return The {@link Value.Builder}
+     */
+    static <T> Value.Builder<T> builder(Class<T> valueClass, ValueParameter<T> parameter) {
+        return ((Value.Builder<T>) Sponge.getRegistry().createBuilder(Value.Builder.class)).setValueClass(valueClass).parser(parameter);
     }
 
     /**
@@ -188,7 +209,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<BigDecimal> bigDecimal() {
-        return Parameter.builder(CatalogedValueParameters.BIG_DECIMAL);
+        return Parameter.builder(BigDecimal.class, CatalogedValueParameters.BIG_DECIMAL);
     }
 
     /**
@@ -198,7 +219,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<BigInteger> bigInteger() {
-        return Parameter.builder(CatalogedValueParameters.BIG_INTEGER);
+        return Parameter.builder(BigInteger.class, CatalogedValueParameters.BIG_INTEGER);
     }
 
     /**
@@ -208,7 +229,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Boolean> bool() {
-        return Parameter.builder(CatalogedValueParameters.BOOLEAN);
+        return Parameter.builder(Boolean.class, CatalogedValueParameters.BOOLEAN);
     }
 
     /**
@@ -218,7 +239,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Color> color() {
-        return Parameter.builder(CatalogedValueParameters.COLOR);
+        return Parameter.builder(Color.class, CatalogedValueParameters.COLOR);
     }
 
     /**
@@ -228,7 +249,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<DataContainer> dataContainer() {
-        return Parameter.builder(CatalogedValueParameters.DATA_CONTAINER);
+        return Parameter.builder(DataContainer.class, CatalogedValueParameters.DATA_CONTAINER);
     }
 
     /**
@@ -238,7 +259,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<LocalDateTime> dateTime() {
-        return Parameter.builder(CatalogedValueParameters.DATE_TIME);
+        return Parameter.builder(LocalDateTime.class, CatalogedValueParameters.DATE_TIME);
     }
 
     /**
@@ -259,7 +280,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Dimension> dimension() {
-        return Parameter.builder(CatalogedValueParameters.DIMENSION);
+        return Parameter.builder(Dimension.class, CatalogedValueParameters.DIMENSION);
     }
 
     /**
@@ -269,7 +290,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Duration> duration() {
-        return Parameter.builder(CatalogedValueParameters.DURATION);
+        return Parameter.builder(Duration.class, CatalogedValueParameters.DURATION);
     }
 
     /**
@@ -279,7 +300,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Double> doubleNumber() {
-        return Parameter.builder(CatalogedValueParameters.DOUBLE);
+        return Parameter.builder(Double.class, CatalogedValueParameters.DOUBLE);
     }
 
     /**
@@ -289,7 +310,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Entity> entity() {
-        return Parameter.builder(CatalogedValueParameters.ENTITY);
+        return Parameter.builder(Entity.class, CatalogedValueParameters.ENTITY);
     }
 
     /**
@@ -310,7 +331,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder entityOrTarget() {
-        return Parameter.builder(CatalogedValueParameters.ENTITY).parser(CatalogedValueParameters.TARGET_ENTITY);
+        return entity().parser(CatalogedValueParameters.TARGET_ENTITY);
     }
 
     /**
@@ -320,7 +341,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Text> formattingCodeText() {
-        return Parameter.builder(CatalogedValueParameters.TEXT_FORMATTING_CODE);
+        return Parameter.builder(Text.class, CatalogedValueParameters.TEXT_FORMATTING_CODE);
     }
 
     /**
@@ -330,7 +351,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Text> formattingCodeTextOfRemainingElements() {
-        return Parameter.builder(CatalogedValueParameters.TEXT_FORMATTING_CODE_ALL);
+        return Parameter.builder(Text.class, CatalogedValueParameters.TEXT_FORMATTING_CODE_ALL);
     }
 
     /**
@@ -340,7 +361,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Integer> integerNumber() {
-        return Parameter.builder(CatalogedValueParameters.INTEGER);
+        return Parameter.builder(Integer.class, CatalogedValueParameters.INTEGER);
     }
 
     /**
@@ -350,7 +371,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<InetAddress> ip() {
-        return Parameter.builder(CatalogedValueParameters.IP);
+        return Parameter.builder(InetAddress.class, CatalogedValueParameters.IP);
     }
 
     /**
@@ -361,8 +382,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder ipOrSource() {
-        return Parameter.builder(CatalogedValueParameters.IP)
-                .orDefault((cause, source) -> source instanceof RemoteConnection ? ((RemoteConnection) source).getAddress().getAddress() : null);
+        return ip().orDefault((cause, source) -> source instanceof RemoteConnection ? ((RemoteConnection) source).getAddress().getAddress() : null);
     }
 
     /**
@@ -372,7 +392,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Text> jsonText() {
-        return Parameter.builder(CatalogedValueParameters.TEXT_JSON);
+        return Parameter.builder(Text.class, CatalogedValueParameters.TEXT_JSON);
     }
 
     /**
@@ -382,7 +402,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Text> jsonTextOfRemainingElements() {
-        return Parameter.builder(CatalogedValueParameters.TEXT_JSON_ALL);
+        return Parameter.builder(Text.class, CatalogedValueParameters.TEXT_JSON_ALL);
     }
 
     /**
@@ -392,7 +412,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Location> location() {
-        return Parameter.builder(CatalogedValueParameters.LOCATION);
+        return Parameter.builder(Location.class, CatalogedValueParameters.LOCATION);
     }
 
     /**
@@ -402,7 +422,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Long> longNumber() {
-        return Parameter.builder(CatalogedValueParameters.LONG);
+        return Parameter.builder(Long.class, CatalogedValueParameters.LONG);
     }
 
     /**
@@ -412,7 +432,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Player> player() {
-        return Parameter.builder(CatalogedValueParameters.PLAYER);
+        return Parameter.builder(Player.class, CatalogedValueParameters.PLAYER);
     }
 
     /**
@@ -433,7 +453,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Player> playerOrTarget() {
-        return Parameter.builder(CatalogedValueParameters.PLAYER).parser(CatalogedValueParameters.TARGET_PLAYER);
+        return player().parser(CatalogedValueParameters.TARGET_PLAYER);
     }
 
     /**
@@ -443,7 +463,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<PluginContainer> plugin() {
-        return Parameter.builder(CatalogedValueParameters.PLUGIN);
+        return Parameter.builder(PluginContainer.class, CatalogedValueParameters.PLUGIN);
     }
 
     /**
@@ -453,7 +473,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<String> remainingJoinedStrings() {
-        return Parameter.builder(CatalogedValueParameters.REMAINING_JOINED_STRINGS);
+        return Parameter.builder(String.class, CatalogedValueParameters.REMAINING_JOINED_STRINGS);
     }
 
     /**
@@ -463,7 +483,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<String> remainingRawJoinedStrings() {
-        return Parameter.builder(CatalogedValueParameters.REMAINING_RAW_JOINED_STRINGS);
+        return Parameter.builder(String.class, CatalogedValueParameters.REMAINING_RAW_JOINED_STRINGS);
     }
 
     /**
@@ -473,7 +493,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<String> string() {
-        return Parameter.builder(CatalogedValueParameters.STRING);
+        return Parameter.builder(String.class, CatalogedValueParameters.STRING);
     }
 
     /**
@@ -483,7 +503,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<URL> url() {
-        return Parameter.builder(CatalogedValueParameters.URL);
+        return Parameter.builder(URL.class, CatalogedValueParameters.URL);
     }
 
     /**
@@ -493,7 +513,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<User> user() {
-        return Parameter.builder(CatalogedValueParameters.USER);
+        return Parameter.builder(User.class, CatalogedValueParameters.USER);
     }
 
     /**
@@ -514,7 +534,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<UUID> uuid() {
-        return Parameter.builder(CatalogedValueParameters.UUID);
+        return Parameter.builder(UUID.class, CatalogedValueParameters.UUID);
     }
 
     /**
@@ -524,7 +544,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Vector3d> vector3d() {
-        return Parameter.builder(CatalogedValueParameters.VECTOR3D);
+        return Parameter.builder(Vector3d.class, CatalogedValueParameters.VECTOR3D);
     }
 
     /**
@@ -534,7 +554,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<WorldProperties> worldProperties() {
-        return Parameter.builder(CatalogedValueParameters.WORLD_PROPERTIES);
+        return Parameter.builder(WorldProperties.class, CatalogedValueParameters.WORLD_PROPERTIES);
     }
 
     /**
@@ -549,7 +569,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static <T extends CatalogType> Parameter.Value.Builder<T> catalogedElement(Class<T> type) {
-        return Parameter.builder(VariableValueParameters.catalogedElementParameterBuilder().setCatalogedType(type)
+        return Parameter.builder(type, VariableValueParameters.catalogedElementParameterBuilder().setCatalogedType(type)
                 .prefix("minecraft")
                 .prefix("sponge")
                 .build());
@@ -571,7 +591,7 @@ public interface Parameter {
             builder.choice(choice, choice);
         }
 
-        return Parameter.builder(builder.build());
+        return Parameter.builder(String.class, builder.build());
     }
 
     /**
@@ -585,7 +605,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static <T> Parameter.Value.Builder<T> choices(Map<String, ? extends T> choices, Class<T> returnType) {
-        return Parameter.builder(VariableValueParameters.staticChoicesBuilder()
+        return Parameter.builder(returnType, VariableValueParameters.staticChoicesBuilder()
                 .setReturnType(returnType)
                 .choices(choices)
                 .setShowInUsage(true).build());
@@ -603,7 +623,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static <T> Parameter.Value.Builder choices(Supplier<Iterable<String>> choices, Function<String, ? extends T> valueFunction, Class<T> returnType) {
-        return Parameter.builder(
+        return Parameter.builder(returnType,
                 VariableValueParameters
                         .dynamicChoicesBuilder()
                         .setShowInUsage(true)
@@ -621,7 +641,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static <T extends Enum<T>> Parameter.Value.Builder enumValue(Class<T> enumClass) {
-        return Parameter.builder(VariableValueParameters.enumBuilder().setEnumClass(enumClass).build());
+        return Parameter.builder(enumClass, VariableValueParameters.enumBuilder().setEnumClass(enumClass).build());
     }
 
     /**
@@ -649,7 +669,8 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static <T> Parameter.Value.Builder<T> literal(T returnedValue, Supplier<Iterable<String>> literalSupplier) {
-        return Parameter.builder(VariableValueParameters.literalBuilder().setReturnValue(returnedValue).setLiteral(literalSupplier).build());
+        return Parameter.builder((Class<T>) returnedValue.getClass(),
+                VariableValueParameters.literalBuilder().setReturnValue(returnedValue).setLiteral(literalSupplier).build());
     }
 
     /**
@@ -688,6 +709,48 @@ public interface Parameter {
     Text getUsage(Cause cause);
 
     /**
+     * A {@link Key}
+     *
+     * @param <T> The type.
+     */
+    interface Key<T> {
+
+        /**
+         * Gets the string key associated with this parameter.
+         *
+         * @return The key.
+         */
+        String key();
+
+        /**
+         * Gets the {@link Class} of the type of object that this parameter
+         * should return from parsing.
+         *
+         * @return The {@link Class}
+         */
+        Class<T> getValueClass();
+
+        /**
+         * A "builder" that allows for keys to be built.
+         */
+        interface Builder extends ResettableBuilder<Key<?>, Builder> {
+
+            /**
+             * Creates a key with the provided key and value class it
+             * represents.
+             *
+             * @param key The key
+             * @param valueClass The {@link Class} that represents the
+             *                   type of value it stores
+             * @param <T> The type of the value represented by the key
+             * @return The built {@link Key}
+             */
+            <T> Key<T> build(String key, Class<T> valueClass);
+        }
+
+    }
+
+    /**
      * Represents a {@link Parameter} that attempts to parse an argument to
      * obtain a value of type {@link T}.
      *
@@ -703,11 +766,11 @@ public interface Parameter {
     interface Value<T> extends Parameter {
 
         /**
-         * Gets the Key associated with this parameter.
+         * The key that a parameter result is stored under.
          *
          * @return The key.
          */
-        String key();
+        Key<T> getKey();
 
         /**
          * The {@link ValueParser}s to use when parsing an argument. They will be
@@ -743,6 +806,17 @@ public interface Parameter {
              * @return This builder, for chaining
              */
             Builder<T> setKey(String key);
+
+            /**
+             * Sets the type of object that this {@link Parameter.Value} will
+             * return.
+             *
+             * @param valueClass The {@link Class}
+             * @return This builder, for chaining.
+             * @throws IllegalStateException if the class is attempted to be set
+             *     more than once.
+             */
+            Builder<T> setValueClass(Class<T> valueClass) throws IllegalStateException;
 
             /**
              * The {@link ValueParser} that will extract the value(s) from the

@@ -28,9 +28,9 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.world.Location;
 
 import java.util.Collection;
@@ -130,7 +130,7 @@ public interface CommandContext {
      * @param key The key to look up
      * @return whether there are any values present
      */
-    boolean hasAny(String key);
+    boolean hasAny(Parameter.Key<?> key);
 
     /**
      * Gets the value for the given key if the key has only one value.
@@ -139,7 +139,9 @@ public interface CommandContext {
      * @param <T> the expected type of the argument
      * @return the argument
      */
-    <T> Optional<T> getOne(Parameter.Value<T> parameter);
+    default <T> Optional<? extends T> getOne(Parameter.Value<T> parameter) {
+        return getOne(parameter.getKey());
+    }
 
     /**
      * Gets the value for the given key if the key has only one value.
@@ -148,7 +150,7 @@ public interface CommandContext {
      * @param <T> the expected type of the argument
      * @return the argument
      */
-    <T> Optional<T> getOne(String key);
+    <T> Optional<? extends T> getOne(Parameter.Key<T> key);
 
     /**
      * Gets the value for the given key if the key has only one value,
@@ -158,7 +160,9 @@ public interface CommandContext {
      * @param <T> the expected type of the argument
      * @return the argument
      */
-    <T> T requireOne(Parameter.Value<T> parameter) throws NoSuchElementException;
+    default  <T> T requireOne(Parameter.Value<T> parameter) throws NoSuchElementException {
+        return requireOne(parameter.getKey());
+    }
 
     /**
      * Gets the value for the given key if the key has only one value,
@@ -168,7 +172,7 @@ public interface CommandContext {
      * @param <T> the expected type of the argument
      * @return the argument
      */
-    <T> T requireOne(String key) throws NoSuchElementException;
+    <T> T requireOne(Parameter.Key<T> key) throws NoSuchElementException;
 
     /**
      * Gets all values for the given argument. May return an empty list if no#
@@ -178,7 +182,9 @@ public interface CommandContext {
      * @param <T> the expected type of the argument
      * @return the argument
      */
-    <T> Collection<T> getAll(Parameter.Value<T> parameter) throws NoSuchElementException;
+    default <T> Collection<? extends T> getAll(Parameter.Value<T> parameter) {
+        return getAll(parameter.getKey());
+    }
 
     /**
      * Gets all values for the given argument. May return an empty list if no
@@ -188,73 +194,70 @@ public interface CommandContext {
      * @param <T> the type of value to get
      * @return the collection of all values
      */
-    <T> Collection<T> getAll(String key);
+    <T> Collection<? extends T> getAll(Parameter.Key<T> key);
 
-    /**
-     * Adds a parsed object into the context, for use by commands.
-     *
-     * @param parameter The key to store the entry under.
-     * @param value The collection of objects to store.
-     */
-    <T> void putEntry(Parameter.Value<T> parameter, T value) throws NoSuchElementException;
+    interface Builder extends ResettableBuilder<CommandContext, Builder>, CommandContext {
 
-    /**
-     * Adds a collection of parsed objects into the context, for use by commands.
-     *
-     * @param parameter The key to store the entry under.
-     * @param value The collection of objects to store.
-     */
-    default <T> void putEntries(Parameter.Value<T> parameter, Collection<T> value) throws NoSuchElementException {
-        value.forEach(val -> putEntry(parameter, val));
+        /**
+         * Adds a parsed object into the context, for use by commands.
+         *
+         * @param parameter The key to store the entry under.
+         * @param value The collection of objects to store.
+         */
+        default <T> void putEntry(Parameter.Value<T> parameter, T value) {
+            putEntry(parameter.getKey(), value);
+        }
+
+        /**
+         * Adds a collection of parsed objects into the context, for use by commands.
+         *
+         * @param parameter The key to store the entry under.
+         * @param value The collection of objects to store.
+         */
+        default <T> void putEntries(Parameter.Value<T> parameter, Collection<T> value) {
+            value.forEach(val -> putEntry(parameter, val));
+        }
+
+        /**
+         * Adds a collection of parsed objects into the context, for use by commands.
+         *
+         * @param parameter The key to store the entry under.
+         * @param value The collection of objects to store.
+         */
+        default <T> void putEntries(Parameter.Key<T> parameter, Collection<T> value) {
+            value.forEach(val -> putEntry(parameter, val));
+        }
+
+        /**
+         * Adds a parsed object into the context, for use by commands.
+         *
+         * @param key The key to store the entry under.
+         * @param object The object to store.
+         */
+        <T> void putEntry(Parameter.Key<T> key, T object);
+
+        /**
+         * Creates a snapshot of this context and returns a state object that can
+         * be used to restore the context to this state.
+         *
+         * @return The state.
+         */
+        State getState();
+
+        /**
+         * Uses a previous snapshot of the context and restores it to that state.
+         *
+         * @param state The state obtained from {@link #getState()}
+         */
+        void setState(State state);
+
+        /**
+         * An immutable snapshot of a {@link CommandContext.Builder}.
+         *
+         * <p>No assumptions should be made about the form of this state object,
+         * it is not defined in the API and may change at any time.</p>
+         */
+        interface State {}
     }
-
-    /**
-     * Adds a parsed object into the context, for use by commands.
-     *
-     * <p>If the object that is added to the context a {@link Collection}, it
-     * will be unwrapped and each entry will be added to the context
-     * individually. However, this does not recurse - collections can be added
-     * to the context by adding a collection containing a collection.</p>
-     *
-     * @param key The key to store the entry under.
-     * @param object The object to store.
-     */
-    void putEntry(Text key, Object object);
-
-    /**
-     * Adds a parsed object into the context, for use by commands.
-     *
-     * <p>If the object that is added to the context a {@link Collection}, it
-     * will be unwrapped and each entry will be added to the context
-     * individually. However, this does not recurse - collections can be added
-     * to the context by adding a collection containing a collection.</p>
-     *
-     * @param key The key to store the entry under.
-     * @param object The object to store.
-     */
-    void putEntry(String key, Object object);
-
-    /**
-     * Creates a snapshot of this context and returns a state object that can
-     * be used to restore the context to this state.
-     *
-     * @return The state.
-     */
-    State getState();
-
-    /**
-     * Uses a previous snapshot of the context and restores it to that state.
-     *
-     * @param state The state obtained from {@link #getState()}
-     */
-    void setState(State state);
-
-    /**
-     * An immutable snapshot of a {@link CommandContext}.
-     *
-     * <p>No assumptions should be made about the form of this state object,
-     * it is not defined in the API and may change at any time.</p>
-     */
-    interface State {}
 
 }
