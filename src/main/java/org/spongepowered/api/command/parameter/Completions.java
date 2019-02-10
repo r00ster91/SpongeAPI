@@ -22,31 +22,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.command.parameter.managed;
+package org.spongepowered.api.command.parameter;
 
-import org.spongepowered.api.command.exception.ArgumentParseException;
-import org.spongepowered.api.command.parameter.CommandContext;
-import org.spongepowered.api.command.parameter.token.ArgumentReader;
+import org.spongepowered.api.util.ResettableBuilder;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Defines how a parameter should be parsed.
+ * Builds the completions to send back to the client.
  */
-@FunctionalInterface
-public interface ValueParser<T> {
+public interface Completions {
 
-    /**
-     * Gets the value for the parameter. This may return more than one value.
-     *
-     * <p>This should have no side effects on anything except on the state of
-     * the {@link ArgumentReader}.</p>
-     *
-     * @param args The {@link ArgumentReader} that contains the unparsed arguments
-     * @param context The {@link CommandContext} containing the state about this command
-     * @return Returns the value(s), usually from {@link ArgumentReader#next()}
-     * @throws ArgumentParseException if a parameter could not be parsed
-     */
-    Optional<T> getValue(ArgumentReader args, CommandContext.Builder context) throws ArgumentParseException;
+    interface Builder extends ResettableBuilder<Completions, Builder> {
+
+        /**
+         * Gets the command that is being completed.
+         *
+         * @return The input string
+         */
+        String getInput();
+
+        /**
+         * Gets the argument(s) that require completion.
+         *
+         * @return The argument(s)
+         */
+        String getRemaining();
+
+        /**
+         * Add a potential completion to the builder.
+         *
+         * @param completion The completion.
+         */
+        Builder addCompletion(String completion);
+
+        /**
+         * Adds a collection of potential completions to the builder.
+         *
+         * @param completions The completions.
+         */
+        default Builder addCompletions(List<String> completions) {
+            completions.forEach(this::addCompletion);
+            return this;
+        }
+
+
+    }
 
 }
