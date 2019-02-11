@@ -26,12 +26,10 @@ package org.spongepowered.api.command.parameter;
 
 import org.spongepowered.api.util.ResettableBuilder;
 
-import java.util.List;
-import java.util.Set;
-
 /**
- * Builds the completions to send back to the client.
+ * Completions to send back to the client
  */
+// TODO: are we exposing this? If not, this just becomes CompletionsBuilder
 public interface Completions {
 
     interface Builder extends ResettableBuilder<Completions, Builder> {
@@ -55,18 +53,30 @@ public interface Completions {
          *
          * @param completion The completion.
          */
-        Builder addCompletion(String completion);
+        Builder suggestion(String completion);
 
         /**
-         * Adds a collection of potential completions to the builder.
+         * Add a potential completion to the builder with a tooltip.
          *
-         * @param completions The completions.
+         * @param completion The completion.
+         * @param tooltip The tooltip to display.
          */
-        default Builder addCompletions(List<String> completions) {
-            completions.forEach(this::addCompletion);
-            return this;
-        }
+        Builder suggestion(String completion, String tooltip);
 
+        /**
+         * Add a potential completion to the builder.
+         *
+         * @param completion The completion.
+         */
+        Builder suggestion(int completion);
+
+        /**
+         * Add a potential completion to the builder with a tooltip.
+         *
+         * @param completion The completion.
+         * @param tooltip The tooltip to display.
+         */
+        Builder suggestion(int completion, String tooltip);
 
     }
 

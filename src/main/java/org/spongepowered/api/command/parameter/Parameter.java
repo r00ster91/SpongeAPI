@@ -36,7 +36,6 @@ import org.spongepowered.api.command.parameter.managed.ValueParser;
 import org.spongepowered.api.command.parameter.managed.ValueUsage;
 import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
 import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
-import org.spongepowered.api.command.parameter.token.ArgumentReader;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
