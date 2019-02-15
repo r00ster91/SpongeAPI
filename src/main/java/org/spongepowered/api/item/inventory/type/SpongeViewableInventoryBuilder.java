@@ -267,41 +267,6 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
         return this;
     }
 
-
-    // Callbacks
-
-    @Override
-    public ViewableInventory.Builder.StepSlot click(BiConsumer<Container, Slot> handler) {
-        for (SlotDefinition def : this.buffer.slots) {
-            // TODO
-        }
-        return this;
-    }
-
-    @Override
-    public ViewableInventory.Builder.StepSlot change(BiConsumer<Container, Slot> handler) {
-        for (SlotDefinition def : this.buffer.slots) {
-            // TODO
-        }
-        return this;
-    }
-
-    @Override
-    public StepSlot autoCancel(boolean enable) {
-        for (SlotDefinition def : this.buffer.slots) {
-            // TODO
-        }
-        return this;
-    }
-
-    @Override
-    public StepSlot shiftMove(boolean allow) {
-        for (SlotDefinition def : this.buffer.slots) {
-            // TODO
-        }
-        return this;
-    }
-
     @Override
     public StepEnd carrier(Carrier carrier) {
         for (SlotDefinition def : this.buffer.slots) {
@@ -364,8 +329,8 @@ ViewableInventory inv = ViewableInventory.builder()
         .source(inv1).grid(3, 3)
         .source(inv2).grid(3, 3).at(3, 1)
         .source(inv3).grid(3, 3).from(3, 0).at(6, 3)
-        .slot().from(0).at(37).change(SpongeViewableInventoryBuilder::onChangeMySlot)
-        .dummy().at(16).click(SpongeViewableInventoryBuilder::onClickMySlot)
+        .slot().from(0).at(37)//.change(SpongeViewableInventoryBuilder::onChangeMySlot)
+        .dummy().at(16)//.click(SpongeViewableInventoryBuilder::onClickMySlot)
         .fillDummy()
         .completeStructure()
         .title(Text.of("test"))

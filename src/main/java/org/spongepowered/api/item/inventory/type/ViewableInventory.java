@@ -69,6 +69,10 @@ public interface ViewableInventory extends Inventory {
 
     ContainerType getContainerType();
 
+    // creates a InventoryMenu which allows adding callbacks for inventory clicks and changes - more lightweight than inventory events
+    // to receive callbacks the inventory MUST be opened from InventoryMenu#open
+    InventoryMenu asMenu();
+
     static Builder builder() {
         return new SpongeViewableInventoryBuilder();
     }
@@ -101,16 +105,7 @@ public interface ViewableInventory extends Inventory {
             StepGrid grid(int sizeX, int sizeY);
         }
 
-        interface StepCallback<T> extends StepBuilding {
-            T click(BiConsumer<Container, Slot> handler);
-            T change(BiConsumer<Container, Slot> handler);
-            // autocancel changes?
-            T autoCancel(boolean enable);
-            // shift-click behaviour?
-            T shiftMove(boolean allow);
-        }
-
-        interface StepSlotLike<T> extends StepCallback<T> {
+        interface StepSlotLike<T> extends StepBuilding {
             T from(int index);
             T at(int index);
         }
@@ -121,13 +116,13 @@ public interface ViewableInventory extends Inventory {
         interface StepDummy extends StepSlotLike<StepDummy>, StepBuilding {
         }
 
-        interface StepGrid extends StepCallback<StepSlot>, StepSource {
+        interface StepGrid extends StepBuilding, StepSource {
             StepGrid from(int x, int y);
             StepGrid at(int x, int y);
         }
 
         interface StepEnd {
-            StepEnd title(Text title);
+            StepEnd title(Text title); // TODO maybe instead only provide when opening/on InventoryMenu
             StepEnd identity(UUID uuid);
             StepEnd carrier(Carrier carrier);
             <E extends InteractContainerEvent> StepEnd listener(Class<E> type, Consumer<E> listener);
