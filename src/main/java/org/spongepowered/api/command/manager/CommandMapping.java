@@ -25,14 +25,13 @@
 package org.spongepowered.api.command.manager;
 
 import org.spongepowered.api.command.Command;
+import org.spongepowered.api.plugin.PluginContainer;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
  * Provides information about a mapping between a command and its aliases.
- *
- * <p>Implementations are not required to implement a sane
- * {@link Object#equals(Object)} but may choose to do so.</p>
  */
 public interface CommandMapping {
 
@@ -58,10 +57,24 @@ public interface CommandMapping {
     Set<String> getAllAliases();
 
     /**
-     * Gets the {@link Command} associated with this mapping.
+     * Gets the plugin that owns the command.
      *
-     * @return The {@link Command}
+     * @return The plugin.
      */
-    Command getCommand();
+    PluginContainer getOwningPlugin();
+
+    /**
+     * Gets the {@link Command} associated with this mapping, if associated
+     * with the Sponge system.
+     *
+     * <p>An {@link Optional#empty()} does not indicate no command, rather
+     * it infers that an object has registered a command via the underlying
+     * engine.</p>
+     *
+     * @return The {@link Command}, if applicable
+     */
+    Optional<Command> getCommand();
+
+
 
 }

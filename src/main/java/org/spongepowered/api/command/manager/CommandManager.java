@@ -1,292 +1,129 @@
-/*
- * This file is part of SpongeAPI, licensed under the MIT License (MIT).
- *
- * Copyright (c) SpongePowered <https://www.spongepowered.org>
- * Copyright (c) contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 package org.spongepowered.api.command.manager;
 
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.source.CommandSource;
-import org.spongepowered.api.command.dispatcher.Dispatcher;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.text.channel.MessageReceiver;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
-import javax.annotation.Nullable;
 
 /**
- * A command dispatcher watches for commands (such as those said in chat)
- * and dispatches them to the correct command handler.
+ * Registers and dispatches commands
  */
-public interface CommandManager extends Dispatcher {
+public interface CommandManager {
 
     /**
-     * Register a given command using the given list of aliases.
+     * Executes a command based on the provided arguments.
      *
-     * <p>If there is a conflict with one of the aliases (i.e. that alias
-     * is already assigned to another command), then the alias will be skipped.
-     * It is possible for there to be no alias to be available out of
-     * the provided list of aliases, which would mean that the command would not
-     * be assigned to any aliases.</p>
-     *
-     * <p>The first non-conflicted alias becomes the "primary alias."</p>
-     *
-     * @param plugin A plugin instance
-     * @param command The command
-     * @param alias An array of aliases
-     * @return The registered command mapping, unless no aliases could be
-     *     registered
-     * @throws IllegalArgumentException Thrown if {@code plugin} is not a
-     *     plugin instance
+     * @param arguments The arguments to parse and execute
+     * @return The {@link CommandResult}
+     * @throws CommandException if something goes wrong during parsing or
+     *                          execution
      */
-    Optional<CommandMapping> register(Object plugin, Command command, String... alias);
+    CommandResult process(String arguments) throws CommandException;
 
     /**
-     * Register a given command using the given list of aliases.
+     * Executes a command based on the provided arguments, with a provided
+     * object that is both a {@link Subject} for permission checks and a
+     * {@link MessageReceiver} to return command messages to.
      *
-     * <p>If there is a conflict with one of the aliases (i.e. that alias
-     * is already assigned to another command), then the alias will be skipped.
-     * It is possible for there to be no alias to be available out of
-     * the provided list of aliases, which would mean that the command would
-     * not be assigned to any aliases.</p>
-     *
-     * <p>The first non-conflicted alias becomes the "primary alias."</p>
-     *
-     * @param plugin A plugin instance
-     * @param command The command
-     * @param aliases A list of aliases
-     * @return The registered command mapping, unless no aliases could be
-     *     registered
-     * @throws IllegalArgumentException Thrown if {@code plugin} is not a
-     *     plugin instance
+     * @param subjectReceiver The {@link Subject} & {@link MessageReceiver}
+     * @param arguments The arguments to parse and execute
+     * @return The {@link CommandResult}
+     * @throws CommandException if something goes wrong during parsing or
+     *                          execution
      */
-    Optional<CommandMapping> register(Object plugin, Command command, List<String> aliases);
+    // TODO: If we keep CommandSource, this goes here.
+    <T extends Subject & MessageReceiver> CommandResult process(T subjectReceiver, String arguments) throws CommandException;
 
     /**
-     * Register a given command using the given list of aliases.
+     * Executes a command based on the provided arguments, with a provided
+     * {@link Subject} for permission checks and a provided
+     * {@link MessageReceiver} to return command messages to.
      *
-     * <p>If there is a conflict with one of the aliases (i.e. that alias
-     * is already assigned to another command), then the alias will be skipped.
-     * It is possible for there to be no alias to be available out of
-     * the provided list of aliases, which would mean that the command would not
-     * be assigned to any aliases.</p>
-     *
-     * <p>The first non-conflicted alias becomes the "primary alias."</p>
-     *
-     * @param pluginContainer A {@link PluginContainer}
-     * @param command The command
-     * @param alias An array of aliases
-     * @return The registered command mapping, unless no aliases could be
-     *     registered
-     * @throws IllegalArgumentException Thrown if {@code plugin} is not a
-     *     plugin instance
+     * @param subject The {@link Subject} for permission checks
+     * @param receiver The {@link MessageReceiver} to return messages to
+     * @param arguments The arguments of the command
+     * @return The {@link CommandResult}
+     * @throws CommandException if something goes wrong during parsing or
+     *                          execution
      */
-    Optional<CommandMapping> register(PluginContainer pluginContainer, Command command, String... alias);
+    CommandResult process(Subject subject, MessageReceiver receiver, String arguments) throws CommandException;
 
     /**
-     * Register a given command using the given list of aliases.
+     * Suggests possible completions based on the input argument string.
      *
-     * <p>If there is a conflict with one of the aliases (i.e. that alias
-     * is already assigned to another command), then the alias will be skipped.
-     * It is possible for there to be no alias to be available out of
-     * the provided list of aliases, which would mean that the command would
-     * not be assigned to any aliases.</p>
-     *
-     * <p>The first non-conflicted alias becomes the "primary alias."</p>
-     *
-     * @param pluginContainer A {@link PluginContainer}
-     * @param command The command
-     * @param aliases A list of aliases
-     * @return The registered command mapping, unless no aliases could be
-     *     registered
-     * @throws IllegalArgumentException Thrown if the {@link PluginContainer}
-     *     is not valid.
+     * @param arguments The arguments
+     * @return The completions
      */
-    Optional<CommandMapping> register(PluginContainer pluginContainer, Command command, List<String> aliases);
+    List<String> suggest(String arguments);
 
     /**
-     * Remove a command identified by the given mapping.
+     * Suggests possible completions based on the input argument string,
+     *  with a provided object that is both a {@link Subject} for permission
+     *  checks and a {@link MessageReceiver} to return command messages to.
      *
-     * @param mapping The mapping
-     * @return The previous mapping associated with the alias, if one was found
+     * @param subjectReceiver The {@link Subject} & {@link MessageReceiver}
+     * @param arguments The arguments
+     * @return The completions
      */
-    Optional<CommandMapping> removeMapping(CommandMapping mapping);
+    <T extends Subject & MessageReceiver> List<String> suggest(T subjectReceiver, String arguments);
 
     /**
-     * Gets a set of plugin containers that have commands registered.
+     * Suggests possible completions based on the input argument string,
+     *  with a provided a {@link Subject} for permission checks and a
+     *  {@link MessageReceiver} to return command messages to.
      *
-     * @return A set of plugin containers
+     * @param subject The {@link Subject}
+     * @param receiver The {@link MessageReceiver}
+     * @param arguments The arguments
+     * @return The completions
      */
-    Set<PluginContainer> getPluginContainers();
+    List<String> suggest(Subject subject, MessageReceiver receiver, String arguments);
 
     /**
-     * Gets a set of commands owned by the given plugin instance.
+     * Registers a {@link Command} with the {@link CommandManager}.
      *
-     * @param instance The plugin instance
-     * @return A set of mappings
+     * @param container The {@link PluginContainer} to register the command for
+     * @param command The {@link Command} to register
+     * @param primaryAlias The first command alias to register
+     * @param secondaryAliases Secondary aliases to register, if any
+     * @return The {@link CommandMapping} if successful.
      */
-    Set<CommandMapping> getOwnedBy(Object instance);
+    Optional<CommandMapping> register(PluginContainer container, Command command, String primaryAlias, String... secondaryAliases);
 
     /**
-     * Gets the owner of a CommandMapping, if any is present.
+     * Unregisters a command based on the alias and provided
+     * {@link PluginContainer}
      *
-     * @param mapping The mapping to get an owner for
-     * @return The owner, if present.
+     * @param container The {@link PluginContainer} that owns the method
+     * @param alias The alias to unregister
+     * @return A {@link CommandMapping} representing what was unregistered.
      */
-    Optional<PluginContainer> getOwner(CommandMapping mapping);
+    Optional<CommandMapping> unregister(PluginContainer container, String alias);
 
     /**
-     * Gets the number of registered aliases.
+     * Unregisters all commands associated with the provided
+     * {@link PluginContainer}
      *
-     * @return The number of aliases
+     * <p>Note that some system {@link PluginContainer}s may not allow for their
+     * commands to be removed.</p>
+     *
+     * @param container The {@link PluginContainer} to remove commands from
+     * @return A {@link Collection} of removed {@link CommandMapping}s
      */
-    int size();
+    Collection<CommandMapping> unregisterAll(PluginContainer container);
 
     /**
-     * Execute the command based on input arguments. The {@link Cause} of the
-     * invocation will be taken from the {@link CauseStackManager} at the time
-     * this method is invoked.
+     * Gets a {@link Collection} of {@link PluginContainer}s with commands
+     * registered.
      *
-     * <p>The implementing class must perform the necessary permission
-     * checks.</p>
-     *
-     * <p>Note that the {@link CommandManager} is <strong>not</strong> permitted
-     * to throw a {@link CommandException} if the selected command fails, it
-     * must handle the error gracefully and return an appropriate
-     * {@link CommandResult}</p>
-     *
-     * @param arguments The raw arguments for this command
-     * @return The result of a command being processed
+     * @return A {@link Collection} of {@link PluginContainer}s.
      */
-    CommandResult process(String arguments);
-
-    /**
-     * Execute the command based on input arguments. The {@link Cause} of the
-     * invocation will be taken from the {@link CauseStackManager} at the time
-     * this method is invoked.
-     *
-     * <p>The implementing class must perform the necessary permission
-     * checks.</p>
-     *
-     * <p>Note that the {@link CommandManager} is <strong>not</strong> permitted
-     * to throw a {@link CommandException} if the selected command fails, it
-     * must handle the error gracefully and return an appropriate
-     * {@link CommandResult}</p>
-     *
-     * @param arguments The raw arguments for this command
-     * @return The result of a command being processed
-     */
-    CommandResult process(CommandSource commandSource, String arguments);
-
-    /**
-     * Execute the command based on input arguments.
-     *
-     * <p>The implementing class must perform the necessary permission
-     * checks.</p>
-     *
-     * <p>Note that the {@link CommandManager} is <strong>not</strong> permitted
-     * to throw a {@link CommandException} if the selected command fails, it
-     * must handle the error gracefully and return an appropriate
-     * {@link CommandResult}</p>
-     *
-     * @param cause The {@link Cause} of the command
-     * @param arguments The raw arguments for this command
-     * @return The result of a command being processed
-     */
-    CommandResult process(Cause cause, String arguments);
-
-    /**
-     * Gets a list of suggestions based on input. The {@link Cause} of the
-     * invocation will be taken from the {@link CauseStackManager} at the time
-     * this method is invoked.
-     *
-     * <p>If a suggestion is chosen by the user, it will replace the last
-     * word.</p>
-     *
-     * <p>Note that the {@link CommandManager} is <strong>not</strong> permitted
-     * to throw a {@link CommandException} if the selected command fails, it
-     * must handle the error gracefully and return a list of suggestions
-     * (which may be empty)</p>
-     *
-     * @param arguments The arguments entered up to this point
-     * @param targetPosition The position the source is looking at when
-     *     performing tab completion
-     * @return A list of suggestions
-     */
-    List<String> getSuggestions(String arguments, @Nullable Location targetPosition);
-
-    /**
-     * Gets a list of suggestions based on input. The {@link Cause} of the
-     * invocation will be taken from the {@link CauseStackManager} at the time
-     * this method is invoked.
-     *
-     * <p>If a suggestion is chosen by the user, it will replace the last
-     * word.</p>
-     *
-     * <p>Note that the {@link CommandManager} is <strong>not</strong> permitted
-     * to throw a {@link CommandException} if the selected command fails, it
-     * must handle the error gracefully and return a list of suggestions
-     * (which may be empty)</p>
-     *
-     * @param arguments The arguments entered up to this point
-     * @param targetPosition The position the source is looking at when
-     *     performing tab completion
-     * @return A list of suggestions
-     */
-    List<String> getSuggestions(CommandSource commandSource, String arguments, @Nullable Location targetPosition);
-
-    /**
-     * Gets a list of suggestions based on input.
-     *
-     * <p>If a suggestion is chosen by the user, it will replace the last
-     * word.</p>
-     *
-     * <p>Note that the {@link CommandManager} is <strong>not</strong> permitted
-     * to throw a {@link CommandException} if the selected command fails, it
-     * must handle the error gracefully and return a list of suggestions
-     * (which may be empty)</p>
-     *
-     * @param cause The {@link Cause}
-     * @param arguments The arguments entered up to this point
-     * @param targetPosition The position the source is looking at when
-     *     performing tab completion
-     * @return A list of suggestions
-     */
-    List<String> getSuggestions(Cause cause, String arguments, @Nullable Location targetPosition);
-
-    /**
-     * Gets the primary alias for the supplied {@link Command}, if it
-     * has been registered.
-     *
-     * @param command The {@link Command}
-     * @return The primary alias, if it exists.
-     */
-    Optional<String> getPrimaryAlias(Command command);
+    Collection<PluginContainer> getPlugins();
 
 }
