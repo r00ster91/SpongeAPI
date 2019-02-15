@@ -5,6 +5,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
 import java.util.Collection;
@@ -43,16 +44,16 @@ public interface CommandManager {
     /**
      * Executes a command based on the provided arguments, with a provided
      * {@link Subject} for permission checks and a provided
-     * {@link MessageReceiver} to return command messages to.
+     * {@link MessageChannel} to return command messages to.
      *
      * @param subject The {@link Subject} for permission checks
-     * @param receiver The {@link MessageReceiver} to return messages to
+     * @param channel The {@link MessageChannel} to return messages to
      * @param arguments The arguments of the command
      * @return The {@link CommandResult}
      * @throws CommandException if something goes wrong during parsing or
      *                          execution
      */
-    CommandResult process(Subject subject, MessageReceiver receiver, String arguments) throws CommandException;
+    CommandResult process(Subject subject, MessageChannel channel, String arguments) throws CommandException;
 
     /**
      * Suggests possible completions based on the input argument string.
@@ -76,14 +77,14 @@ public interface CommandManager {
     /**
      * Suggests possible completions based on the input argument string,
      *  with a provided a {@link Subject} for permission checks and a
-     *  {@link MessageReceiver} to return command messages to.
+     *  {@link MessageChannel} to return command messages to.
      *
      * @param subject The {@link Subject}
-     * @param receiver The {@link MessageReceiver}
+     * @param receiver The {@link MessageChannel}
      * @param arguments The arguments
      * @return The completions
      */
-    List<String> suggest(Subject subject, MessageReceiver receiver, String arguments);
+    List<String> suggest(Subject subject, MessageChannel receiver, String arguments);
 
     /**
      * Registers a {@link Command} with the {@link CommandManager}.
@@ -100,11 +101,10 @@ public interface CommandManager {
      * Unregisters a command based on the alias and provided
      * {@link PluginContainer}
      *
-     * @param container The {@link PluginContainer} that owns the method
-     * @param alias The alias to unregister
-     * @return A {@link CommandMapping} representing what was unregistered.
+     * @param mapping The {@link CommandMapping} that represents the command to remove.
+     * @return A {@link CommandMapping} representing what was unregistered, if anything.
      */
-    Optional<CommandMapping> unregister(PluginContainer container, String alias);
+    Optional<CommandMapping> unregister(CommandMapping mapping);
 
     /**
      * Unregisters all commands associated with the provided
