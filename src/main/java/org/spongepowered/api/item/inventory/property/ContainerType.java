@@ -26,21 +26,12 @@ package org.spongepowered.api.item.inventory.property;
 
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.item.inventory.Container;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.util.annotation.CatalogedBy;
 
 /**
- * GuiIds are used in a {@link GuiIdProperty} when building a custom {@link Inventory}.
- * The GuiId defines what {@link Container} is displayed on the client side when the
- * custom inventory is opened.
- *
- * <p>When using the default vanilla {@link InventoryArchetype}s the
- * GuiIdProperty is already set, but can be overridden.</p>
- *
- * <p>Sponge will not allow to open a inventory that has the wrong
- * total size for the GuiId. e.g. You can open a 1x9 Grid Inventory as
- * a Dispenser (3x3). But a 2x9 inventory will not work with it.</p>
+ * ContainerTypes are used when building a custom {@link ViewableInventory}.
+ * It defines what {@link Container} is displayed on the client side when the inventory is opened.
  */
 @CatalogedBy(ContainerTypes.class)
 public interface ContainerType extends CatalogType {

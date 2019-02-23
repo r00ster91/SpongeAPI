@@ -1,16 +1,15 @@
 package org.spongepowered.api.item.inventory.type;
 
 import org.apache.commons.lang3.Validate;
-import org.spongepowered.api.event.item.inventory.container.InteractContainerEvent;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.ContainerType;
 import org.spongepowered.api.item.inventory.property.ContainerTypes;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
@@ -18,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -275,14 +272,6 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
         return this;
     }
 
-    @Override
-    public <E extends InteractContainerEvent> StepEnd listener(Class<E> type, Consumer<E> listener) {
-        for (SlotDefinition def : this.buffer.slots) {
-            // TODO
-        }
-        return this;
-    }
-
     // Build
 
     @Override
@@ -320,6 +309,9 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
 
     static void foobar()
     {
+Player player = null;
+Player player2 = null;
+
 Inventory inv1 = Inventory.builder().grid(3, 3).completeStructure().build();
 Inventory inv2 = Inventory.builder().grid(3, 3).completeStructure().build();
 Inventory inv3 = Inventory.builder().grid(9, 3).completeStructure().build();
@@ -329,8 +321,8 @@ ViewableInventory inv = ViewableInventory.builder()
         .source(inv1).grid(3, 3)
         .source(inv2).grid(3, 3).at(3, 1)
         .source(inv3).grid(3, 3).from(3, 0).at(6, 3)
-        .slot().from(0).at(37)//.change(SpongeViewableInventoryBuilder::onChangeMySlot)
-        .dummy().at(16)//.click(SpongeViewableInventoryBuilder::onClickMySlot)
+        .slot().from(0).at(37)
+        .dummy().at(16)
         .fillDummy()
         .completeStructure()
         .title(Text.of("test"))
@@ -348,6 +340,7 @@ ViewableInventory withTitle = ViewableInventory.builder()
         .build();
 
 ItemStackSnapshot disabled = ItemStack.of(ItemTypes.LIGHT_GRAY_STAINED_GLASS_PANE, 1).createSnapshot();
+ItemStackSnapshot emerald = ItemStack.of(ItemTypes.EMERALD, 1).createSnapshot();
 
 ViewableInventory display = ViewableInventory.builder().type(ContainerTypes.DISPENSER)
         .fillDummy(disabled)
@@ -355,12 +348,31 @@ ViewableInventory display = ViewableInventory.builder().type(ContainerTypes.DISP
         .completeStructure().build();
 display.query(GridInventory.class).get().set(1,1, ItemStack.of(ItemTypes.DIAMOND, 1));
 
+ViewableInventory display2 = ViewableInventory.builder().type(ContainerTypes.DISPENSER)
+        .fillDummy(disabled)
+        .dummy(emerald).at(1, 1)
+        .completeStructure().build();
+display.query(GridInventory.class).get().set(1,1, ItemStack.of(ItemTypes.DIAMOND, 1));
+
+InventoryMenu menu = InventoryMenu.of(display);
+menu.open(player);
+menu.open(player2);
+
+menu.setCurrentInventory(display2); // matching ContainerType so the inventory is silently swapped
+menu.setTitle(Text.of("This reopens containers"));
+menu.registerClick((container, slot, slotIndex, clickType) -> checkClick(), SlotIndex.of(4));
+
+menu.setReadOnly(false);
+menu.registerChange((container, slot, slotIndex) -> checkAllChange());
+
+menu.setReadOnly(true);
+menu.setCurrentInventory(basicChest);
+menu.clearCallbacks(); // already done as changing the ContainerType clears all callbacks
+
     }
 
-    static void onClickMySlot(Container container, Slot slot) {  }
-    static void onChangeMySlot(Container container, Slot slot) {  }
-
-
+    static boolean checkClick() { return true; }
+    static boolean checkAllChange() { return false; }
 
 
 }

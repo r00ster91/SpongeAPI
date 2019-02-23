@@ -40,6 +40,7 @@ import org.spongepowered.api.util.CopyableBuilder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Base interface for queryable inventories.

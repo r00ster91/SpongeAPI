@@ -85,13 +85,14 @@ public interface ViewableInventory extends Inventory {
         interface StepBuilding {
             StepSource source(Inventory inventory);
 
-            StepDummy dummy();
-            StepDummy dummy(ItemStackSnapshot item);
+            StepOneDummy dummy();
+            StepOneDummy dummy(ItemStackSnapshot item);
+
             StepDummy dummy(int amount);
             StepDummy dummy(int amount, ItemStackSnapshot item);
 
-            StepDummy fillDummy(ItemStackSnapshot item);
-            StepDummy fillDummy();
+            StepBuilding fillDummy(ItemStackSnapshot item);
+            StepBuilding fillDummy();
 
             // complete inventory structure into lens
             // if no slots and source added assume vanilla structure
@@ -100,20 +101,27 @@ public interface ViewableInventory extends Inventory {
         }
 
         interface StepSource extends StepBuilding {
-            StepSlot slot();
+            StepOneSlot slot();
             StepSlot slots(int amount);
             StepGrid grid(int sizeX, int sizeY);
         }
 
-        interface StepSlotLike<T> extends StepBuilding {
-            T from(int index);
-            T at(int index);
+        interface StepSlot extends StepSource {
+            StepSlot from(int index);
+            StepSource at(int index);
         }
 
-        interface StepSlot extends StepSlotLike<StepSlot>, StepSource {
+        interface StepOneSlot extends StepSlot {
+            StepOneSlot from(int x, int y);
+            StepBuilding at(int x, int y);
         }
 
-        interface StepDummy extends StepSlotLike<StepDummy>, StepBuilding {
+        interface StepDummy extends StepBuilding {
+            StepBuilding at(int index);
+        }
+
+        interface StepOneDummy extends StepDummy {
+            StepBuilding at(int x, int y);
         }
 
         interface StepGrid extends StepBuilding, StepSource {
@@ -125,7 +133,6 @@ public interface ViewableInventory extends Inventory {
             StepEnd title(Text title); // TODO maybe instead only provide when opening/on InventoryMenu
             StepEnd identity(UUID uuid);
             StepEnd carrier(Carrier carrier);
-            <E extends InteractContainerEvent> StepEnd listener(Class<E> type, Consumer<E> listener);
 
             ViewableInventory build();
         }
