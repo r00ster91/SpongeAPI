@@ -118,13 +118,6 @@ public interface CommandContext {
     Optional<BlockSnapshot> getTargetBlock();
 
     /**
-     * Returns if the current command being parsed is for a tab completion.
-     *
-     * @return {@code true} if so
-     */
-    boolean isCompletion();
-
-    /**
      * Returns whether this context has any value for the given argument key.
      *
      * @param key The key to look up

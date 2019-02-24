@@ -65,6 +65,7 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -269,7 +270,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<LocalDateTime> dateTimeOrNow() {
-        return dateTime().orDefault(LocalDateTime::now);
+        return dateTime().orDefault(cause -> LocalDateTime.now());
     }
 
     /**
@@ -314,13 +315,13 @@ public interface Parameter {
 
     /**
      * Creates a builder that has the {@link ValueParameter} set to
-     * {@link CatalogedValueParameters#ENTITY}, using the {@link CommandSource}
+     * {@link CatalogedValueParameters#ENTITY}, using the {@link Cause#root()}
      * as the default if they are an {@link Entity}
      *
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Entity> entityOrSource() {
-        return entity().orDefault((cause, source) -> source instanceof Entity ? (Entity) source : null);
+        return entity().orDefault(cause -> cause.root() instanceof Entity ? (Entity) cause.root() : null);
     }
 
     /**
@@ -381,7 +382,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder ipOrSource() {
-        return ip().orDefault((cause, source) -> source instanceof RemoteConnection ? ((RemoteConnection) source).getAddress().getAddress() : null);
+        return ip().orDefault(cause -> cause.root() instanceof RemoteConnection ? ((RemoteConnection) cause.root()).getAddress().getAddress() : null);
     }
 
     /**
@@ -437,12 +438,12 @@ public interface Parameter {
     /**
      * Creates a builder that has the {@link ValueParameter} set to
      * {@link CatalogedValueParameters#PLAYER}, defaulting to the
-     * {@link CommandSource} if it is a {@link Player}.
+     * {@link Cause#root()} if it is a {@link Player}.
      *
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<Player> playerOrSource() {
-        return player().orDefault((cause, source) -> source instanceof Player ? (Player) source : null);
+        return player().orDefault(cause -> cause.root() instanceof Player ? (Player) cause.root() : null);
     }
 
     /**
@@ -523,7 +524,7 @@ public interface Parameter {
      * @return A {@link Parameter.Value.Builder}
      */
     static Parameter.Value.Builder<User> userOrSource() {
-        return user().orDefault((cause, source) -> source instanceof User ? (User) source : null);
+        return user().orDefault(cause -> cause.root() instanceof User ? (User) cause.root() : null);
     }
 
     /**
@@ -792,6 +793,21 @@ public interface Parameter {
         Optional<ValueCompleter> getCompleter();
 
         /**
+         * Gets a {@link Predicate} that indicates whether a given {@link Cause}
+         * should parse this {@link Parameter}.
+         *
+         * @return the predicate
+         */
+        Predicate<Cause> getRequirement();
+
+        /**
+         * Gets whether this parameter is optional.
+         *
+         * @return true if optional, else false.
+         */
+        boolean isOptional();
+
+        /**
          * Builds a {@link Parameter} from constituent components.
          */
         interface Builder<T> extends ResettableBuilder<Parameter.Value<T>, Builder<T>> {
@@ -843,8 +859,8 @@ public interface Parameter {
             Builder<T> setSuggestions(@Nullable ValueCompleter completer);
 
             /**
-             * Sets the usage. The {@link BiFunction} accepts the parameter key
-             * and the calling {@link CommandSource}.
+             * Sets the usage. The {@link Function} accepts the parameter key
+             * and the calling {@link Cause}.
              *
              * <p>Optional. If this is <code>null</code> (or never set),
              * the usage string will either be provided via the supplied
@@ -870,17 +886,11 @@ public interface Parameter {
              *                   no check.
              * @return This builder, for chaining
              */
-            default Builder<T> setRequiredPermission(@Nullable String permission) {
-                if (permission == null) {
-                    return setRequirements(null);
-                }
-                return setRequirements((cause, source) -> source.hasPermission(permission));
-            }
+            Builder<T> setRequiredPermission(@Nullable String permission);
 
             /**
              * Sets a function that determines what is required of the provided
-             * {@link Cause} and {@link CommandSource} before this parameter
-             * attempts to parse.
+             * {@link Cause} before this parameter attempts to parse.
              *
              * <p>If this is set to {@code null}, this parameter will always
              * attempt to parse, subject to other modifiers.</p>
@@ -891,7 +901,7 @@ public interface Parameter {
              * @param executionRequirements A function that sets the
              * @return This builder, for chaining
              */
-            Builder<T> setRequirements(@Nullable BiPredicate<Cause, CommandSource> executionRequirements);
+            Builder<T> setRequirements(@Nullable Predicate<Cause> executionRequirements);
 
             /**
              * If set, this parameter will repeat until the argument string has
@@ -946,7 +956,7 @@ public interface Parameter {
              * @return This builder, for chaining
              */
             default Builder<T> orDefault(T defaultValue) {
-                return orDefault((cause, commandSource) -> defaultValue);
+                return orDefault(cause -> defaultValue);
             }
 
             /**
@@ -985,7 +995,7 @@ public interface Parameter {
              *                             if the parameter is not optional.
              * @return This builder, for chaining
              */
-            Builder<T> orDefault(BiFunction<Cause, CommandSource, T> defaultValueFunction);
+            Builder<T> orDefault(Function<Cause, T> defaultValueFunction);
 
             /**
              * Creates a {@link Parameter} from the builder.

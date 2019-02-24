@@ -44,9 +44,9 @@ public interface ValueParser<T> {
      *
      * @param args The {@link ArgumentReader} that contains the unparsed arguments
      * @param context The {@link CommandContext} containing the state about this command
-     * @return Returns the value(s), usually from {@link ArgumentReader#next()}
+     * @return Returns the value(s)
      * @throws ArgumentParseException if a parameter could not be parsed
      */
-    Optional<T> getValue(ArgumentReader args, CommandContext.Builder context) throws ArgumentParseException;
+    Optional<? extends T> getValue(ArgumentReader.Mutable args, CommandContext.Builder context) throws ArgumentParseException;
 
 }
