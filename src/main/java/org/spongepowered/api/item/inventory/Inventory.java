@@ -37,6 +37,7 @@ import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResu
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.CopyableBuilder;
+import org.spongepowered.api.util.ResettableBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,9 @@ import java.util.UUID;
 public interface Inventory extends Nameable, PropertyHolder {
 
     /**
-     * Creates a new {@link Inventory.Builder} to build an {@link Inventory}.
+     * Creates a new {@link Inventory.Builder} to build a basic {@link Inventory}.
+     * <p>Inventories created by this builder cannot be opened.</p>
+     * <p>If you want to show the inventory to a Client use {@link ViewableInventory#builder()}</p>
      *
      * @return The builder
      */
@@ -514,23 +517,78 @@ public interface Inventory extends Nameable, PropertyHolder {
     /**
      * A builder for free-form Inventories.
      */
-    interface Builder extends CopyableBuilder<Inventory, Builder> {
+    interface Builder extends ResettableBuilder<Inventory, Inventory.Builder> {
 
-        // adds n indexed slots
-        StepBuilding slots(int n);
-        // adds a grid of x*y slots
-        StepBuilding grid(int x, int y);
-        // adds an inventory
-        StepBuilding inventory(Inventory inventory);
+        /**
+         * Adds one or more slots.
+         *
+         * @param amount the amount of slots to add
+         *
+         * @return the building step
+         */
+        BuildingStep slots(int amount);
 
-        interface StepBuilding extends Builder {
-            StepEnd completeStructure();
+        /**
+         * Adds a grid of slots.
+         *
+         * @param sizeX the horizontal size
+         * @param sizeY the vertical size
+         *
+         * @return the building step
+         */
+        BuildingStep grid(int sizeX, int sizeY);
+
+        /**
+         * Adds an existing inventory.
+         *
+         * @param inventory the inventory to add.
+         *
+         * @return the building step
+         */
+        BuildingStep inventory(Inventory inventory);
+
+        /**
+         * The building step. The inventory structure can be completed at any time.
+         */
+        interface BuildingStep extends Builder {
+
+            /**
+             * Completes the inventory structure.
+             *
+             * @return the end step
+             */
+            EndStep completeStructure();
         }
 
-        interface StepEnd {
-            StepEnd identity(UUID uuid);
-            StepEnd carrier(Carrier carrier);
-            Inventory build();
+        /**
+         * The end Step. You can set an identifier and/or carrier for the inventory before building it.
+         */
+        interface EndStep {
+
+            /**
+             * Sets a unique identifier. Can be retrieved later using. {@link Inventory#getProperty(Property)} with {@link InventoryProperties#UNIQUE_ID}
+             *
+             * @param uuid the UUID.
+             *
+             * @return this step
+             */
+            EndStep identity(UUID uuid);
+
+            /**
+             * Sets a carrier.
+             *
+             * @param carrier the carrier.
+             *
+             * @return this step
+             */
+            EndStep carrier(Carrier carrier);
+
+            /**
+             * Builds the inventory.
+             *
+             * @return the new inventory.
+             */
+            ViewableInventory build();
         }
     }
 

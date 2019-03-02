@@ -4,29 +4,59 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.ContainerType;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
 // A Menu based on an Inventory
+
+/**
+ * Helper for Menus based on Inventories.
+ * <p>This helper provides simple callbacks that can be used instead of listening to inventory events.</p>
+ */
 public interface InventoryMenu {
 
+    /**
+     * Creates a new InventoryMenu based on given inventory.
+     *
+     * @param inventory the inventory
+     *
+     * @return the new menu.
+     */
     static InventoryMenu of(ViewableInventory inventory) {
         return inventory.asMenu();
     }
 
-    // Current Inventory
+    /**
+     * Returns the current inventory used in this menu.
+     *
+     * @return the current inventory
+     */
     ViewableInventory getCurrentInventory();
-    // Type of the current inventory
+
+    /**
+     * Returns the container type of the current inventory.
+     *
+     * @return current container type.
+     */
     ContainerType getType();
 
-    // If ContainerType matches - this can change the inventory without reopening
-    // Different ContainerType clears existing callbacks - closes and reopens inventory for viewing players
+    /**
+     * Sets a new inventory. If the ContainerType does not change the inventory will be swapped out silently.
+     * <p>If the ContainerType is different all existing callbacks are cleared and open menus are closed and reopened with the new inventory.</p>
+     *
+     * @param inventory
+     */
     void setCurrentInventory(ViewableInventory inventory);
 
-    // Reopens the Container with the new Title
+    /**
+     * Sets the title of this menu.
+     * <p>Any open menus are closed and reopened with the new title.</p>
+     *
+     * @param title the new title.
+     */
     void setTitle(Text title);
 
     // Register callback for clicked slot ; no param=all
@@ -43,6 +73,15 @@ public interface InventoryMenu {
     }
 
     // readonly for the entire inventory default true
+
+    /**
+     * Sets the readonly mode for this menu.
+     * <p>By default this is true and cancels any change in menu.</p>
+     *
+     * @param readOnly whether to make the menu readonly or not.
+     *
+     * @return this menu
+     */
     InventoryMenu setReadOnly(boolean readOnly);
 
     // unregister all at given SlotIndex

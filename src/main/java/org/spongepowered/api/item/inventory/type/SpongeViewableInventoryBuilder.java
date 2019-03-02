@@ -11,7 +11,7 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.property.ContainerType;
 import org.spongepowered.api.item.inventory.property.ContainerTypes;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
@@ -24,11 +24,10 @@ import javax.annotation.Nullable;
 
 // TODO move to IMPL
 public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder,
-                                                       ViewableInventory.Builder.StepSlot,
-                                                       ViewableInventory.Builder.StepDummy,
-                                                       ViewableInventory.Builder.StepSource,
-                                                       ViewableInventory.Builder.StepGrid,
-                                                       ViewableInventory.Builder.StepEnd {
+                                                       ViewableInventory.Builder.SingleStep,
+                                                       ViewableInventory.Builder.EndStep
+
+{
 
     // Helper classes
     private class SlotDefinition {
@@ -120,7 +119,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public ViewableInventory.Builder.StepBuilding type(ContainerType type) {
+    public BuildingStep type(ContainerType type) {
         this.type = type;
         this.slotDefinitions = new HashMap<>();
         this.currentSlot = 0;
@@ -132,7 +131,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public ViewableInventory.Builder.StepSource source(Inventory inventory) {
+    public SourceStep source(Inventory inventory) {
         this.source = inventory;
         this.currentSourceSlot = 0;
         return this;
@@ -267,7 +266,7 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     }
 
     @Override
-    public StepEnd carrier(Carrier carrier) {
+    public EndStep carrier(Carrier carrier) {
         for (SlotDefinition def : this.buffer.slots) {
             // TODO
         }
@@ -277,24 +276,24 @@ public class SpongeViewableInventoryBuilder implements ViewableInventory.Builder
     // Build
 
     @Override
-    public ViewableInventory.Builder.StepEnd completeStructure() {
+    public EndStep completeStructure() {
         // TODO build lens
         return this;
     }
 
     @Override
-    public StepEnd ofViewable(Inventory inventory) {
+    public EndStep ofViewable(Inventory inventory) {
         // TODO copy type from inventory
         return null;
     }
 
     @Override
-    public ViewableInventory.Builder.StepEnd title(Text title) {
+    public EndStep title(Text title) {
         // TODO
         return null;
     }
 
-    @Override public StepEnd identity(UUID uuid) {
+    @Override public EndStep identity(UUID uuid) {
         // TODO
         return null;
     }
@@ -323,11 +322,10 @@ ViewableInventory inv = ViewableInventory.builder()
         .source(inv1).grid(3, 3)
         .source(inv2).grid(3, 3).at(3, 1)
         .source(inv3).grid(3, 3).from(3, 0).at(6, 3)
-        .slot().from(0).at(37)
-        .dummy().at(16)
+                     .slot().from(0).at(37)
+        .dummySource().slot().at(16)
         .fillDummy()
         .completeStructure()
-        .title(Text.of("test"))
         .identity(UUID.randomUUID())
         .build();
 
@@ -336,23 +334,18 @@ ViewableInventory basicChest = ViewableInventory.builder()
         .completeStructure()
         .build();
 
-ViewableInventory withTitle = ViewableInventory.builder()
-        .ofViewable(basicChest)
-        .title(Text.of("title"))
-        .build();
-
 ItemStackSnapshot disabled = ItemStack.of(ItemTypes.LIGHT_GRAY_STAINED_GLASS_PANE, 1).createSnapshot();
 ItemStackSnapshot emerald = ItemStack.of(ItemTypes.EMERALD, 1).createSnapshot();
 
 ViewableInventory display = ViewableInventory.builder().type(ContainerTypes.DISPENSER)
-        .fillDummy(disabled)
+        .dummySource(disabled).fillDummy()
         .source(inv2).grid(1,1).from(1,1).at(1,1)
         .completeStructure().build();
 display.query(GridInventory.class).get().set(1,1, ItemStack.of(ItemTypes.DIAMOND, 1));
 
 ViewableInventory display2 = ViewableInventory.builder().type(ContainerTypes.DISPENSER)
-        .fillDummy(disabled)
-        .dummy(emerald).at(1, 1)
+        .dummySource().fillDummy()
+        .dummySource(emerald).slot().at(1, 1)
         .completeStructure().build();
 display.query(GridInventory.class).get().set(1,1, ItemStack.of(ItemTypes.DIAMOND, 1));
 
