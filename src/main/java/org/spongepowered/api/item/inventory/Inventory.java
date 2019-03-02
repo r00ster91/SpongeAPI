@@ -592,7 +592,7 @@ public interface Inventory extends Nameable, PropertyHolder {
              *
              * @return the new inventory.
              */
-            ViewableInventory build();
+            Inventory build();
         }
     }
 

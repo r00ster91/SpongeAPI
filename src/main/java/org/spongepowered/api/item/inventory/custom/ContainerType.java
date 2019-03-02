@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.item.inventory.property;
+package org.spongepowered.api.item.inventory.custom;
 
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.item.inventory.Container;

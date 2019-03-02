@@ -26,7 +26,7 @@ package org.spongepowered.api.item.inventory.menu;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Container;
-import org.spongepowered.api.item.inventory.property.ContainerType;
+import org.spongepowered.api.item.inventory.custom.ContainerType;
 import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.text.Text;
