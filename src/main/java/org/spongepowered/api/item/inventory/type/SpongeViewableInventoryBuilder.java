@@ -7,6 +7,8 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.property.ContainerType;
 import org.spongepowered.api.item.inventory.property.ContainerTypes;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
@@ -368,6 +370,16 @@ menu.registerChange((container, slot, slotIndex) -> checkAllChange());
 menu.setReadOnly(true);
 menu.setCurrentInventory(basicChest);
 menu.clearCallbacks(); // already done as changing the ContainerType clears all callbacks
+
+EquipmentInventory armor = null;
+GridInventory mainGrid = null;
+Slot offhand = null;
+
+ViewableInventory.builder().type(ContainerTypes.CHEST)
+.source(armor).slots(4)
+.source(mainGrid).slots(5)
+.source(offhand).slot()
+.completeStructure();
 
     }
 
