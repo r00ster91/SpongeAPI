@@ -175,6 +175,10 @@ public interface Inventory extends Nameable, PropertyHolder {
      */
     InventoryTransactionResult offer(ItemStack stack);
 
+    // Multiple offer calls chained together
+    // TODO javadocs
+    InventoryTransactionResult offer(ItemStack... stack);
+
     /**
      * Returns true if the entire stack can fit in this inventory.
      *
