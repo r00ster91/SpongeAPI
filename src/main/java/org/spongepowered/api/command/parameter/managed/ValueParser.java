@@ -25,8 +25,10 @@
 package org.spongepowered.api.command.parameter.managed;
 
 import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.managed.CommandExecutor;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.ArgumentReader;
+import org.spongepowered.api.event.cause.Cause;
 
 import java.util.Optional;
 
@@ -41,6 +43,20 @@ public interface ValueParser<T> {
      *
      * <p>This should have no side effects on anything except on the state of
      * the {@link ArgumentReader}.</p>
+     *
+     * <p>This element may return nothing in the form of an empty optional.
+     * This indicates that a parse succeeded, but no meaningful value was
+     * returned, for example, the argument must be passed but it's not
+     * necessary for the associated {@link CommandExecutor} to know what
+     * the result of the parse was.</p>
+     *
+     * <p>While the {@link CommandContext.Builder} is provided, in general,
+     * you do not need to add the parsed value to it yourself, instead
+     * preferring to return your parsed value. It is permissible, however,
+     * to add additional information to the context should it be required.</p>
+     *
+     * <p>The {@link Cause} of this parse is provided in the
+     * {@link CommandContext.Builder}.</p>
      *
      * @param args The {@link ArgumentReader} that contains the unparsed arguments
      * @param context The {@link CommandContext} containing the state about this command

@@ -76,7 +76,7 @@ public class ArgumentParseException extends CommandException {
         }
     }
 
-    private Text getSuperText() {
+    public Text getSuperText() {
         return super.getText();
     }
 

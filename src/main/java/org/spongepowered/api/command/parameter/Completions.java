@@ -26,6 +26,8 @@ package org.spongepowered.api.command.parameter;
 
 import org.spongepowered.api.util.ResettableBuilder;
 
+import java.util.List;
+
 /**
  * Completions to send back to the client
  */
@@ -77,6 +79,14 @@ public interface Completions {
          * @param tooltip The tooltip to display.
          */
         Builder suggestion(int completion, String tooltip);
+
+        /**
+         * Builds a list of {@link String}s that represent the potential
+         * suggestions.
+         *
+         * @return The list of strings.
+         */
+        List<String> buildList();
 
     }
 

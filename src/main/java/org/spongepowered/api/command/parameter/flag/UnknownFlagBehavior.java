@@ -58,6 +58,6 @@ public interface UnknownFlagBehavior extends CatalogType {
      * @throws ArgumentParseException thrown if there is an issue parsing the
      *                                 argument
      */
-    void parse(Cause cause, ArgumentReader args, CommandContext context, ArgumentReader.State tokenizedArgsPreviousState,
-            CommandContext.State contextPreviousState, String flag) throws ArgumentParseException;
+    void parse(Cause cause, ArgumentReader args, CommandContext context, ArgumentReader tokenizedArgsPreviousState,
+            CommandContext contextPreviousState, String flag) throws ArgumentParseException;
 }

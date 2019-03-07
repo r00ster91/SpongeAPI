@@ -676,20 +676,18 @@ public interface Parameter {
     /**
      * Parses the next element(s) in the {@link CommandContext}
      *
-     * @param cause The {@link Cause} requesting execution of this command
-     * @param args The {@link ArgumentReader} containing the strings that need
-     *             to be parsed
-     * @param context The {@link CommandContext} that contains the
+     * @param args The {@link ArgumentReader.Mutable} containing the strings
+     *             that need to be parsed
+     * @param context The {@link CommandContext.Builder} that contains the
      *                current state of the execution
      * @throws ArgumentParseException thrown if the parameter could not be
      *      parsed
      */
-    void parse(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
+    void parse(ArgumentReader.Mutable args, CommandContext.Builder context) throws ArgumentParseException;
 
     /**
      * Returns potential completions of the current tokenized argument.
      *
-     * @param cause The {@link Cause} requesting execution of this command
      * @param args The {@link ArgumentReader} containing the strings that need
      *             to be parsed
      * @param context The {@link CommandContext} that contains the
@@ -698,7 +696,7 @@ public interface Parameter {
      * @throws ArgumentParseException thrown if the parameter could not be
      *      parsed
      */
-    List<String> complete(Cause cause, ArgumentReader args, CommandContext context) throws ArgumentParseException;
+    List<String> complete(ArgumentReader args, CommandContext context) throws ArgumentParseException;
 
     /**
      * Gets the usage of this parameter.
@@ -785,12 +783,11 @@ public interface Parameter {
         Collection<ValueParser<? extends T>> getParsers();
 
         /**
-         * Gets the {@link ValueCompleter} associated with this {@link Value},
-         * if any.
+         * Gets the {@link ValueCompleter} associated with this {@link Value}.
          *
          * @return The {@link ValueCompleter}.
          */
-        Optional<ValueCompleter> getCompleter();
+        ValueCompleter getCompleter();
 
         /**
          * Gets a {@link Predicate} that indicates whether a given {@link Cause}
