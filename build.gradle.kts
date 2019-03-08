@@ -1,16 +1,6 @@
 import org.spongepowered.eventimplgen.EventImplGenTask
 import org.spongepowered.gradle.task.TaskSortClassMembers
 
-buildscript {
-    repositories {
-        maven(Repo.sponge)
-        mavenLocal()
-    }
-    dependencies {
-        classpath("org.spongepowered:event-impl-gen:6.0.2-SNAPSHOT")
-    }
-}
-
 plugins {
     `java-library`
     `maven-publish`
@@ -21,11 +11,11 @@ plugins {
     id(Plugins.shadow) version Versions.shadow apply false
     id(Plugins.spongeGradleId) version Versions.spongegradle apply false
     id(Plugins.sponge)
+    id(Plugins.`event-impl-gen`) version Versions.`event-impl-gen`
 }
 
 apply(plugin = Plugins.spongegradle)
 apply(plugin = Plugins.spongemeta)
-apply(plugin = Plugins.`event-impl-gen`)
 
 val ap by sourceSets.registering {
     compileClasspath += sourceSets.main.get().compileClasspath + sourceSets.main.get().output
@@ -70,21 +60,27 @@ dependencies {
     compileOnly(Libs.asm)
 }
 
+val genEventImpl = tasks.named<EventImplGenTask>("genEventImpl")
+
+
 tasks {
-    val genEventImpl by existing(EventImplGenTask::class) {
-        outputFactory = "org.spongepowered.api.event.SpongeEventFactory"
-        include("org/spongepowered/api/util/annotation/eventgen/")
-        include("org/spongepowered/api/event/*/**/*")
-        exclude("org/spongepowered/api/event/cause/")
-        exclude("org/spongepowered/api/event/filter/")
-        exclude("org/spongepowered/api/event/impl/")
+
+     genEventImpl {
+         outputFactory = "org.spongepowered.api.event.SpongeEventFactory"
+         include("org/spongepowered/api/util/annotation/eventgen/")
+         include("org/spongepowered/api/event/*/**/*")
+         exclude("org/spongepowered/api/event/cause/")
+         exclude("org/spongepowered/api/event/filter/")
+         exclude("org/spongepowered/api/event/impl/")
     }
+
     findByName("setupDecompWorkspace")?.apply {
-        dependsOn(genEventImpl.get())
+        dependsOn(genEventImpl)
     }
     compileJava {
-        dependsOn(genEventImpl.get())
+        dependsOn(genEventImpl)
     }
+
     jar {
         from(ap.get().output)
         manifest {

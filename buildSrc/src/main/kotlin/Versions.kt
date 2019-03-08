@@ -9,7 +9,7 @@ object Versions {
     const val configurate = "3.6"
     const val `flow-math` = "1.0.3"
     const val `flow-noise` = "1.0.1-SNAPSHOT"
-    const val `event-impl-gen` = "6.0.1-SNAPSHOT"
+    const val `event-impl-gen` = "5.7.0"
     const val spongegradle = "0.8.1"
     const val asm = "5.2"
     const val licenser = "0.4.1"
