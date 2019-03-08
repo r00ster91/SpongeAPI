@@ -1,0 +1,47 @@
+object Deps {
+    object Groups {
+        const val google = "com.google"
+        const val guava = "com.google.guava"
+        const val gson = "com.google.code.gson"
+        const val sponge = "org.spongepowered"
+        const val junit = "junit"
+        const val asm = "org.ow2.asm"
+        const val hamcrest = "org.hamcrest"
+        const val mockito = "org.mockito"
+        const val slf4j = "org.slf4j"
+        const val errorProne = "$google.errorprone"
+        const val apache = "org.apache"
+        const val `apache_commons` = "$apache.commons"
+        const val findBugs = "$google.code.findbugs"
+        const val guice = "$google.inject"
+        const val caffeine = "com.github.ben-manes.caffeine"
+        const val flowpowered = "com.flowpowered"
+
+    }
+
+    object Modules {
+        const val slf4j = "slf4j-api"
+        const val junit = "junit"
+        const val hamcrest = "hamcrest-library"
+        const val guava = "guava"
+        const val errorProne = "error_prone_annotations"
+        const val gson = "gson"
+        const val spongeAPI = "spongeapi"
+        const val spongecommon = "spongecommon"
+        const val spongeforge = "spongeforge"
+        const val spongevanilla = "spongevanilla"
+        const val asm = "asm"
+        const val mockito = "mockito-core"
+        const val apache_commons = "commons-lang3"
+        const val jsr305 = "jsr305"
+        const val guice = "guice"
+        const val caffeine = "caffeine"
+        const val plugin_meta = "plugin-meta"
+        const val configurate = "configurate"
+        const val configurate_hocon = "$configurate-hocon"
+        const val configurate_gson = "$configurate-gson"
+        const val configurate_yaml = "$configurate-yaml"
+        const val flow_math = "flow-math"
+        const val flow_noise = "flow-noise"
+    }
+}
