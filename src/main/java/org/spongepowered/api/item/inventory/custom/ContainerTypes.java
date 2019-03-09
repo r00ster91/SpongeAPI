@@ -34,43 +34,47 @@ public final class ContainerTypes {
     // SORTFIELDS:ON
 
     /**
-     * Size only multiple of 9 up to 6x9.
+     * Size 27 (3x9)
      */
     public static final ContainerType CHEST = DummyObjectProvider.createFor(ContainerType.class, "chest"); // "minecraft:chest"
     /**
-     * Size only 3.
+     * Size 54 (6x9)
+     */
+    public static final ContainerType DOUBLE_CHEST = DummyObjectProvider.createFor(ContainerType.class, "double_chest"); // "minecraft:chest"
+    /**
+     * Size 3.
      */
     public static final ContainerType FURNACE = DummyObjectProvider.createFor(ContainerType.class, "furnace"); // "minecraft:furnace"
     /**
-     * Size only 9.
+     * Size 9 (3x3).
      */
     public static final ContainerType DISPENSER = DummyObjectProvider.createFor(ContainerType.class, "dispenser"); // "minecraft:dispenser"
     /**
-     * Size only 10.
+     * Size 10 (3x3+1).
      */
     public static final ContainerType CRAFTING_TABLE = DummyObjectProvider.createFor(ContainerType.class, "crafting_table"); // "minecraft:crafting_table"
     /**
-     * Size only 5.
+     * Size 5.
      */
     public static final ContainerType BREWING_STAND = DummyObjectProvider.createFor(ContainerType.class, "brewing_stand"); // "minecraft:brewing_stand"
     /**
-     * Size only 5.
+     * Size 5 (1x5).
      */
     public static final ContainerType HOPPER = DummyObjectProvider.createFor(ContainerType.class, "hopper"); // "minecraft:hopper"
     /**
-     * Size only 1.
+     * Size 1.
      */
     public static final ContainerType BEACON = DummyObjectProvider.createFor(ContainerType.class, "beacon"); // "minecraft:beacon"
     /**
-     * Size only 2.
+     * Size 2.
      */
     public static final ContainerType ENCHANTING_TABLE = DummyObjectProvider.createFor(ContainerType.class, "enchanting_table"); // "minecraft:enchanting_table"
     /**
-     * Size only 3.
+     * Size 3.
      */
     public static final ContainerType ANVIL = DummyObjectProvider.createFor(ContainerType.class, "anvil"); // "minecraft:anvil"
     /**
-     * Size only 3.
+     * Size 3.
      */
     public static final ContainerType VILLAGER = DummyObjectProvider.createFor(ContainerType.class, "villager"); // "minecraft:villager"
     /**
@@ -78,7 +82,7 @@ public final class ContainerTypes {
      */
     public static final ContainerType HORSE = DummyObjectProvider.createFor(ContainerType.class, "horse"); // "minecraft:horse" internally "EntityHorse"
     /**
-     * Size only 27 (3x9).
+     * Size 27 (3x9). Shulker boxes are not allowed in shulker boxes.
      */
     public static final ContainerType SHULKER_BOX = DummyObjectProvider.createFor(ContainerType.class, "shulker_box"); // "minecraft:shulker_box"
 
