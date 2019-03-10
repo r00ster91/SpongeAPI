@@ -85,11 +85,11 @@ public interface InventoryMenu {
     /**
      * Registers click callbacks. Unregisters previously registered handler of the same type.
      * <p>Return false in the handler to prevent changes.</p>
+     * <p>Possible handlers: {@link ClickHandler}, {@link SlotClickHandler}, {@link KeySwapHandler}, {@link SlotChangeHandler}, {@link CloseHandler}</p>
      *
      * @param handler the handler
-     * @param <T> the handler type {@link ClickHandler}, {@link SlotClickHandler} or {@link KeySwapHandler}
      */
-    <T> void registerClickHandler(T handler);
+    void registerHandler(Object handler);
 
     /**
      * Registers a click callback. Unregisters previously registered handler of the same type.
@@ -130,7 +130,7 @@ public interface InventoryMenu {
      *
      * @param handler the callback handler
      */
-    void registerClose(BiConsumer<Container, Player> handler);
+    void registerClose(CloseHandler handler);
 
     /**
      * Registers a callback handler that prevents any change
@@ -141,6 +141,11 @@ public interface InventoryMenu {
     }
 
     /**
+     * Unregisters all callback handlers.
+     */
+    void unregisterAll();
+
+    /**
      * Sets the readonly mode for this menu.
      * <p>By default this is true and cancels any change in menu.</p>
      *
@@ -149,18 +154,6 @@ public interface InventoryMenu {
      * @return this menu
      */
     InventoryMenu setReadOnly(boolean readOnly);
-
-    /**
-     * Unregisters all callback handlers at given slotIndices.
-     *
-     * @param slotIndices the slot indices the handlers should be removed for
-     */
-    void unregisterAt(SlotIndex... slotIndices);
-
-    /**
-     * Unregisters all callback handlers.
-     */
-    void unregisterAll();
 
     /**
      * Opens this menu for given player.
