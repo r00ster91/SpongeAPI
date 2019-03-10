@@ -83,56 +83,61 @@ public interface InventoryMenu {
     void setTitle(Text title);
 
     /**
-     * Registers a callback for given slotIndices. If none are specified the callback fires for all slots.
+     * Registers click callbacks. Unregisters previously registered handler of the same type.
      * <p>Return false in the handler to prevent changes.</p>
      *
-     * @param handler the callback handler
-     * @param slotIndices the slot indices the handler should be active for.
+     * @param handler the handler
+     * @param <T> the handler type {@link ClickHandler}, {@link SlotClickHandler} or {@link KeySwapHandler}
      */
-    void registerSlotClick(SlotClickHandler handler, SlotIndex... slotIndices);
+    <T> void registerClickHandler(T handler);
 
     /**
-     * Registers a callback for clicks with no slot.
+     * Registers a click callback. Unregisters previously registered handler of the same type.
      * <p>Return false in the handler to prevent changes.</p>
      *
-     * @param handler the callback handler
+     * @param handler the handler
      */
+
     void registerClick(ClickHandler handler);
 
     /**
-     * Registers a callback for given slotIndices. If none are specified the callback fires for all slots.
+     * Registers a slot click callback. Unregisters previously registered handler of the same type.
      * <p>Return false in the handler to prevent changes.</p>
      *
-     * @param handler the callback handler
-     * @param slotIndices the slot indices the handler should be active for.
+     * @param handler the handler
      */
-    void registerKeySwap(KeySwapHandler handler, SlotIndex... slotIndices);
+    void registerSlotClick(SlotClickHandler handler);
 
     /**
-     * Registers a callback for given slotIndices. If none are specified the callback fires for all slots.
+     * Registers a key-swap click callback. Unregisters previously registered handler of the same type.
+     * <p>Return false in the handler to prevent changes.</p>
+     *
+     * @param handler the handler
+     */
+    void registerKeySwap(KeySwapHandler handler);
+
+    /**
+     * Registers a change callback. Unregisters previously registered SlotChangeHandler.
      * <p>You can override the behaviour of {@link #setReadOnly(boolean)} with this.</p>
      * <p>Return false in the handler to prevent changes.</p>
      *
      * @param handler the callback handler
-     * @param slotIndices the slot indices the handler should be active for
      */
-    void registerChange(SlotChangeHandler handler, SlotIndex... slotIndices);
+    void registerChange(SlotChangeHandler handler);
 
     /**
-     * Registers a callback when this menu is closed.
+     * Registers a callback for when this menu is closed. Unregisters previously registered handler.
      *
      * @param handler the callback handler
      */
     void registerClose(BiConsumer<Container, Player> handler);
 
     /**
-     * Registers a callback handler that prevents any change to given slotIndeces.
+     * Registers a callback handler that prevents any change
      * <p>You can override the behaviour of {@link #setReadOnly(boolean)} with this.</p>
-     *
-     * @param slotIndices the slot indices the handler should be active for
      */
-    default void registerReadOnly(SlotIndex... slotIndices) {
-        registerChange((container, slot, slotIndex) -> false, slotIndices);
+    default void registerReadOnly() {
+        registerChange((container, slot, slotIndex) -> false);
     }
 
     /**

@@ -30,8 +30,10 @@ import org.spongepowered.api.util.annotation.CatalogedBy;
 
 /**
  * Click types in {@link Container}s
+ *
+ * @param <T> The handler for the click type
  */
 @CatalogedBy(ClickTypes.class)
-public interface ClickType extends CatalogType {
+public interface ClickType<T> extends CatalogType {
 
 }

@@ -36,72 +36,71 @@ public class ClickTypes {
     // SORTFIELDS:ON
 
     /**
-     * Left click on a slot. Uses {@link SlotClickHandler}
+     * Left click on a slot.
      */
-    public static final ClickType CLICK_LEFT = DummyObjectProvider.createFor(ClickType.class, "click_left");
+    public static final ClickType<SlotClickHandler> CLICK_LEFT = DummyObjectProvider.createExtendedFor(ClickType.class, "click_left");
     /**
-     * Left click outside of inventory. Uses {@link ClickHandler}
+     * Left click outside of inventory.
      */
-    public static final ClickType CLICK_LEFT_OUTSIDE = DummyObjectProvider.createFor(ClickType.class, "click_left_outside");
+    public static final ClickType<ClickHandler> CLICK_LEFT_OUTSIDE = DummyObjectProvider.createExtendedFor(ClickType.class, "click_left_outside");
     /**
-     * Right click on a slot. Uses {@link SlotClickHandler}
+     * Right click on a slot.
      */
-    public static final ClickType CLICK_RIGHT = DummyObjectProvider.createFor(ClickType.class, "click_right");
+    public static final ClickType<SlotClickHandler> CLICK_RIGHT = DummyObjectProvider.createExtendedFor(ClickType.class, "click_right");
     /**
-     * Right click outside of inventory. Uses {@link ClickHandler}
+     * Right click outside of inventory.
      */
-    public static final ClickType CLICK_RIGHT_OUTSIDE = DummyObjectProvider.createFor(ClickType.class, "click_right_outside");
+    public static final ClickType<ClickHandler> CLICK_RIGHT_OUTSIDE = DummyObjectProvider.createExtendedFor(ClickType.class, "click_right_outside");
     /**
-     * Shift-Left click on a slot. Uses {@link SlotClickHandler}
+     * Shift-Left click on a slot.
      */
-    public static final ClickType SHIFT_CLICK_LEFT = DummyObjectProvider.createFor(ClickType.class, "shift_click_left");
+    public static final ClickType<SlotClickHandler> SHIFT_CLICK_LEFT = DummyObjectProvider.createExtendedFor(ClickType.class, "shift_click_left");
     /**
-     * Shift-Right click on a slot. Uses {@link SlotClickHandler}
+     * Shift-Right click on a slot.
      */
-    public static final ClickType SHIFT_CLICK_RIGHT = DummyObjectProvider.createFor(ClickType.class, "shift_click_right");
+    public static final ClickType<SlotClickHandler> SHIFT_CLICK_RIGHT = DummyObjectProvider.createExtendedFor(ClickType.class, "shift_click_right");
     /**
      * This click-type is used when using a number key-press to swap the corresponding hotbar slot with the slot hovered over.
      * <p>The primary slot is the hovered slot.</p>
      * <p>The secondary slot is the hotbar slot.</p>
-     * Uses {@link KeySwapHandler}
      */
-    public static final ClickType KEY_SWAP = DummyObjectProvider.createFor(ClickType.class, "key_swap");
+    public static final ClickType<KeySwapHandler> KEY_SWAP = DummyObjectProvider.createExtendedFor(ClickType.class, "key_swap");
     /**
-     * Used to clone the clicked item onto the cursor in creative. Uses {@link SlotClickHandler}
+     * Used to clone the clicked item onto the cursor in creative.
      */
-    public static final ClickType CLICK_MIDDLE = DummyObjectProvider.createFor(ClickType.class, "click_middle");
+    public static final ClickType<SlotClickHandler> CLICK_MIDDLE = DummyObjectProvider.createExtendedFor(ClickType.class, "click_middle");
     /**
-     * Throwing one item in the hovered slot using the throw item key. Uses {@link SlotClickHandler}
+     * Throwing one item in the hovered slot using the throw item key.
      */
-    public static final ClickType KEY_THROW_ONE = DummyObjectProvider.createFor(ClickType.class, "key_throw_one");
+    public static final ClickType<SlotClickHandler> KEY_THROW_ONE = DummyObjectProvider.createExtendedFor(ClickType.class, "key_throw_one");
     /**
-     * Throwing all items in the hovered slot using the throw item key. Uses {@link SlotClickHandler}
+     * Throwing all items in the hovered slot using the throw item key.
      */
-    public static final ClickType KEY_THROW_ALL = DummyObjectProvider.createFor(ClickType.class, "key_throw_all");
+    public static final ClickType<SlotClickHandler> KEY_THROW_ALL = DummyObjectProvider.createExtendedFor(ClickType.class, "key_throw_all");
     /**
-     * Starting drag motion. Uses {@link ClickHandler}
+     * Starting drag motion.
      */
-    public static final ClickType DRAG_START = DummyObjectProvider.createFor(ClickType.class, "drag_start");
+    public static final ClickType<ClickHandler> DRAG_START = DummyObjectProvider.createExtendedFor(ClickType.class, "drag_start");
     /**
-     * Left-click drag motion. Uses {@link SlotClickHandler}
+     * Left-click drag motion.
      */
-    public static final ClickType DRAG_LEFT_ADD = DummyObjectProvider.createFor(ClickType.class, "drag_left_add");
+    public static final ClickType<SlotClickHandler> DRAG_LEFT_ADD = DummyObjectProvider.createExtendedFor(ClickType.class, "drag_left_add");
     /**
-     * Right-click drag motion. Uses {@link SlotClickHandler}
+     * Right-click drag motion.
      */
-    public static final ClickType DRAG_RIGHT_ADD = DummyObjectProvider.createFor(ClickType.class, "drag_right_add");
+    public static final ClickType<SlotClickHandler> DRAG_RIGHT_ADD = DummyObjectProvider.createExtendedFor(ClickType.class, "drag_right_add");
     /**
-     * Middle-click drag motion. Uses {@link SlotClickHandler}
+     * Middle-click drag motion.
      */
-    public static final ClickType DRAG_MIDDLE_ADD = DummyObjectProvider.createFor(ClickType.class, "drag_middle_add");
+    public static final ClickType<SlotClickHandler> DRAG_MIDDLE_ADD = DummyObjectProvider.createExtendedFor(ClickType.class, "drag_middle_add");
     /**
-     * Stopping drag motion. This distributes items on the cursor in all previously added slots. Uses {@link ClickHandler}
+     * Stopping drag motion. This distributes items on the cursor in all previously added slots.
      */
-    public static final ClickType DRAG_END = DummyObjectProvider.createFor(ClickType.class, "drag_end");
+    public static final ClickType<ClickHandler> DRAG_END = DummyObjectProvider.createExtendedFor(ClickType.class, "drag_end");
     /**
-     * Collects as much items of the same type as possible to the cursor. Uses {@link SlotClickHandler}
+     * Collects as much items of the same type as possible to the cursor.
      */
-    public static final ClickType DOUBLE_CLICK = DummyObjectProvider.createFor(ClickType.class, "double_click");
+    public static final ClickType<SlotClickHandler> DOUBLE_CLICK = DummyObjectProvider.createExtendedFor(ClickType.class, "double_click");
 
     // SORTFIELDS:OFF
 }
