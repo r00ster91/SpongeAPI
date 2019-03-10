@@ -25,18 +25,17 @@
 package org.spongepowered.api.item.inventory.menu;
 
 import org.spongepowered.api.item.inventory.Container;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.slot.SlotIndex;
 
 @FunctionalInterface
-public interface SlotChangeHandler {
+public interface ClickHandler {
 
     /**
-     * Handler for inventory change callbacks.
+     * Handler for inventory click callbacks except without slot.
      *
      * @param container the container
-     * @param slot the changed slot
-     * @param slotIndex the changed slot index
+     * @param clickType the type of click
+     *
+     * @return false to prevent the action
      */
-    boolean handle(Container container, Slot slot, SlotIndex slotIndex);
+    boolean handle(Container container, ClickType clickType);
 }

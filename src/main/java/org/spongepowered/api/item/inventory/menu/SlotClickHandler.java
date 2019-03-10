@@ -28,21 +28,18 @@ import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.slot.SlotIndex;
 
-import javax.annotation.Nullable;
-
 @FunctionalInterface
 public interface SlotClickHandler {
 
     /**
-     * Handler for inventory click callbacks.
+     * Handler for inventory click callbacks except {@link ClickTypes#KEY_SWAP} see {@link KeySwapHandler}
      *
      * @param container the container
      * @param slot the primary clicked slot
      * @param slotIndex the primary clicked slot index
      * @param clickType the type of click
-     * @param slot2 the secondary slot in the interaction. not null for {@link ClickTypes#KEY_SWAP}
      *
-     * @return false to prevent the click
+     * @return false to prevent the action
      */
-    boolean handle(Container container, Slot slot, SlotIndex slotIndex, ClickType clickType, @Nullable Slot slot2);
+    boolean handle(Container container, Slot slot, SlotIndex slotIndex, ClickType clickType);
 }

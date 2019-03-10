@@ -29,14 +29,18 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.slot.SlotIndex;
 
 @FunctionalInterface
-public interface SlotChangeHandler {
+public interface KeySwapHandler {
 
     /**
-     * Handler for inventory change callbacks.
+     * Handler for inventory {@link ClickTypes#KEY_SWAP} callbacks.
      *
      * @param container the container
-     * @param slot the changed slot
-     * @param slotIndex the changed slot index
+     * @param slot the primary clicked slot
+     * @param slotIndex the primary clicked slot index
+     * @param clickType the type of click
+     * @param slot2 the secondary slot in the interaction.
+     *
+     * @return false to prevent the action
      */
-    boolean handle(Container container, Slot slot, SlotIndex slotIndex);
+    boolean handle(Container container, Slot slot, SlotIndex slotIndex, ClickType clickType, Slot slot2);
 }

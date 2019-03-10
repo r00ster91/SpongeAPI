@@ -84,21 +84,38 @@ public interface InventoryMenu {
 
     /**
      * Registers a callback for given slotIndices. If none are specified the callback fires for all slots.
+     * <p>Return false in the handler to prevent changes.</p>
      *
      * @param handler the callback handler
      * @param slotIndices the slot indices the handler should be active for.
      */
-    // Mixin at begin of Container#slotClick and do nothing. (maybe need to send rollback packets to client)
-    void registerClick(SlotClickHandler handler, SlotIndex... slotIndices);
+    void registerSlotClick(SlotClickHandler handler, SlotIndex... slotIndices);
+
+    /**
+     * Registers a callback for clicks with no slot.
+     * <p>Return false in the handler to prevent changes.</p>
+     *
+     * @param handler the callback handler
+     */
+    void registerClick(ClickHandler handler);
+
+    /**
+     * Registers a callback for given slotIndices. If none are specified the callback fires for all slots.
+     * <p>Return false in the handler to prevent changes.</p>
+     *
+     * @param handler the callback handler
+     * @param slotIndices the slot indices the handler should be active for.
+     */
+    void registerKeySwap(KeySwapHandler handler, SlotIndex... slotIndices);
 
     /**
      * Registers a callback for given slotIndices. If none are specified the callback fires for all slots.
      * <p>You can override the behaviour of {@link #setReadOnly(boolean)} with this.</p>
+     * <p>Return false in the handler to prevent changes.</p>
      *
      * @param handler the callback handler
      * @param slotIndices the slot indices the handler should be active for
      */
-    // TODO impl: in detectAndSendChanges
     void registerChange(SlotChangeHandler handler, SlotIndex... slotIndices);
 
     /**
