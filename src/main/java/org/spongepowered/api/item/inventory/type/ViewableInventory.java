@@ -25,6 +25,7 @@
 package org.spongepowered.api.item.inventory.type;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.sun.javafx.geom.Vec2d;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.entity.living.player.Player;
@@ -32,10 +33,13 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.custom.ContainerType;
+import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.util.ResettableBuilder;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -122,6 +126,60 @@ public interface ViewableInventory extends Inventory {
          */
         interface BuildingStep {
 
+            // New Proposal:
+            // would need a way to query for arbitrary grids in an inventory
+
+            // dummy slots
+            BuildingStep dummySlots(int count); // no offset
+            BuildingStep dummySlots(int count, int offset);
+            BuildingStep dummySlots(int count, Vector2i offset);
+            // dummy slots with default item
+            BuildingStep dummySlots(int count, ItemStackSnapshot item); // no offset
+            BuildingStep dummySlots(int count, int offset, ItemStackSnapshot item);
+            BuildingStep dummySlots(int count, Vector2i offset, ItemStackSnapshot item);
+            // dummy grid
+            BuildingStep dummyGrid(Vector2i size); // no offset
+            BuildingStep dummyGrid(Vector2i size, int offset);
+            BuildingStep dummyGrid(Vector2i size, Vector2i offset);
+            // dummy grid with default item
+            BuildingStep dummyGrid(Vector2i size, ItemStackSnapshot item); // no offset
+            BuildingStep dummyGrid(Vector2i size, int offset, ItemStackSnapshot item);
+            BuildingStep dummyGrid(Vector2i size, Vector2i offset, ItemStackSnapshot item);
+            // slots sourced from list
+            BuildingStep slots(List<Slot>source); // no offset
+            BuildingStep slots(List<Slot> source, int offset);
+            BuildingStep slots(List<Slot> source, Vector2i offset);
+            // source must be size.x*size.y slots
+            BuildingStep grid(Vector2i size, List<Slot>source); // no offset
+            BuildingStep grid(Vector2i size, int offset, List<Slot>source);
+            BuildingStep grid(Vector2i size, Vector2i offset, List<Slot>source);
+            // provide target slot index/position
+            BuildingStep slotsAtIndizes(List<Slot>source, List<SlotIndex> at);
+            BuildingStep slotsAtPositions(List<Slot>source, List<Vector2i> at);
+
+            // fillDummy no args stays
+            BuildingStep fillDummy(ItemStackSnapshot item);
+            // completeStructure stays
+
+            //Previous stuff below
+
+            /**
+             * Adds all undefined slots as dummy slots.
+             *
+             * @return the building step.
+             */
+            BuildingStep fillDummy();
+
+            /**
+             * Completes the inventory structure.
+             * <p>If no slots are defined this will create the structure mirroring the vanilla type.</p>
+             * <p>If some but not all slots are defined undefined slots will be defined using {@link #fillDummy()}</p>
+             *
+             * @return the end step
+             */
+            EndStep completeStructure();
+
+
             /**
              * Sets the source inventory for the following calls.
              * @param inventory the next source inventory
@@ -145,22 +203,6 @@ public interface ViewableInventory extends Inventory {
              * @return the dummy source step
              */
             SourceStep dummySource(ItemStackSnapshot item);
-
-            /**
-             * Adds all undefined slots as dummy slots.
-             *
-             * @return the building step.
-             */
-            BuildingStep fillDummy();
-
-            /**
-             * Completes the inventory structure.
-             * <p>If no slots are defined this will create the structure mirroring the vanilla type.</p>
-             * <p>If some but not all slots are defined undefined slots will be defined using {@link #fillDummy()}</p>
-             *
-             * @return the end step
-             */
-            EndStep completeStructure();
         }
 
 
