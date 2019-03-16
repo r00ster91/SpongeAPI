@@ -22,21 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.item.inventory.menu;
+package org.spongepowered.api.item.inventory.menu.handler;
 
-import org.spongepowered.api.item.inventory.Container;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.slot.SlotIndex;
+import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 
-@FunctionalInterface
-public interface SlotChangeHandler {
-
-    /**
-     * Handler for inventory change callbacks.
-     *
-     * @param container the container
-     * @param slot the changed slot
-     * @param slotIndex the changed slot index
-     */
-    boolean handle(Container container, Slot slot, SlotIndex slotIndex);
+/**
+ * Marker Interface for callback handlers in {@link InventoryMenu}s
+ */
+public interface InventoryCallbackHandler {
 }

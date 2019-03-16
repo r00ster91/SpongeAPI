@@ -27,12 +27,16 @@ package org.spongepowered.api.item.inventory.menu;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.custom.ContainerType;
-import org.spongepowered.api.item.inventory.slot.SlotIndex;
+import org.spongepowered.api.item.inventory.menu.handler.ClickHandler;
+import org.spongepowered.api.item.inventory.menu.handler.CloseHandler;
+import org.spongepowered.api.item.inventory.menu.handler.InventoryCallbackHandler;
+import org.spongepowered.api.item.inventory.menu.handler.KeySwapHandler;
+import org.spongepowered.api.item.inventory.menu.handler.SlotChangeHandler;
+import org.spongepowered.api.item.inventory.menu.handler.SlotClickHandler;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 /**
  * Helper for Menus based on Inventories.
@@ -57,7 +61,7 @@ public interface InventoryMenu {
      *
      * @return the current inventory
      */
-    ViewableInventory getCurrentInventory();
+    ViewableInventory getInventory();
 
     /**
      * Returns the container type of the current inventory.
@@ -89,7 +93,7 @@ public interface InventoryMenu {
      *
      * @param handler the handler
      */
-    void registerHandler(Object handler);
+    void registerHandler(InventoryCallbackHandler handler);
 
     /**
      * Registers a click callback. Unregisters previously registered handler of the same type.
@@ -131,14 +135,6 @@ public interface InventoryMenu {
      * @param handler the callback handler
      */
     void registerClose(CloseHandler handler);
-
-    /**
-     * Registers a callback handler that prevents any change
-     * <p>You can override the behaviour of {@link #setReadOnly(boolean)} with this.</p>
-     */
-    default void registerReadOnly() {
-        registerChange((container, slot, slotIndex) -> false);
-    }
 
     /**
      * Unregisters all callback handlers.

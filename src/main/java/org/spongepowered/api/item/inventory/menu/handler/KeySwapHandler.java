@@ -22,24 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.item.inventory.menu;
+package org.spongepowered.api.item.inventory.menu.handler;
 
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.menu.ClickType;
+import org.spongepowered.api.item.inventory.menu.ClickTypes;
 import org.spongepowered.api.item.inventory.slot.SlotIndex;
 
 @FunctionalInterface
-public interface SlotClickHandler {
+public interface KeySwapHandler extends InventoryCallbackHandler {
 
     /**
-     * Handler for inventory click callbacks except {@link ClickTypes#KEY_SWAP} see {@link KeySwapHandler}
+     * Handler for inventory {@link ClickTypes#KEY_SWAP} callbacks.
      *
+     * @param cause the cause
      * @param container the container
      * @param slot the primary clicked slot
      * @param slotIndex the primary clicked slot index
      * @param clickType the type of click
+     * @param slot2 the secondary slot in the interaction.
      *
      * @return false to prevent the action
      */
-    boolean handle(Container container, Slot slot, SlotIndex slotIndex, ClickType clickType);
+    boolean handle(Cause cause, Container container, Slot slot, SlotIndex slotIndex, ClickType clickType, Slot slot2);
 }

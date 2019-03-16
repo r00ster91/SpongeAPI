@@ -26,6 +26,9 @@
 package org.spongepowered.api.item.inventory.menu;
 
 import org.spongepowered.api.item.inventory.Container;
+import org.spongepowered.api.item.inventory.menu.handler.ClickHandler;
+import org.spongepowered.api.item.inventory.menu.handler.KeySwapHandler;
+import org.spongepowered.api.item.inventory.menu.handler.SlotClickHandler;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 /**

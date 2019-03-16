@@ -36,11 +36,11 @@ public final class ContainerTypes {
     /**
      * Size 27 (3x9)
      */
-    public static final ContainerType CHEST = DummyObjectProvider.createFor(ContainerType.class, "chest"); // "minecraft:chest"
+    public static final ContainerType CHEST_3X9 = DummyObjectProvider.createFor(ContainerType.class, "chest_3x9"); // "minecraft:chest"
     /**
      * Size 54 (6x9)
      */
-    public static final ContainerType DOUBLE_CHEST = DummyObjectProvider.createFor(ContainerType.class, "double_chest"); // "minecraft:chest"
+    public static final ContainerType CHEST_6x9 = DummyObjectProvider.createFor(ContainerType.class, "chest_6x9"); // "minecraft:chest"
     /**
      * Size 3.
      */

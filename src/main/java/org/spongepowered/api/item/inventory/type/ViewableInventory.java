@@ -76,10 +76,7 @@ public interface ViewableInventory extends Inventory {
      *
      * @return the ContainerType of this viewable inventory.
      */
-    ContainerType getContainerType();
-
-    // creates a InventoryMenu which allows adding callbacks for inventory clicks and changes - more lightweight than inventory events
-    // to receive callbacks the inventory MUST be opened from InventoryMenu#open
+    ContainerType getType();
 
     /**
      * Create a new {@link InventoryMenu} based on this ViewableInventory which allows for lightweight callbacks on inventory clicks and changes.

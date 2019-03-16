@@ -22,21 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.api.item.inventory.menu;
+package org.spongepowered.api.item.inventory.menu.handler;
 
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Container;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.slot.SlotIndex;
+import org.spongepowered.api.item.inventory.menu.ClickType;
 
 @FunctionalInterface
-public interface CloseHandler {
+public interface ClickHandler extends InventoryCallbackHandler {
 
     /**
-     * Handler for inventory closing.
+     * Handler for inventory click callbacks without slot.
      *
+     * @param cause the cause
      * @param container the container
-     * @param player the viewing player
+     * @param clickType the type of click
+     *
+     * @return false to prevent the action
      */
-    void handle(Container container, Player player);
+    boolean handle(Cause cause, Container container, ClickType clickType);
 }
