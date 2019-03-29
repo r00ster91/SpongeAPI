@@ -28,6 +28,7 @@ import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.source.CommandSource;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.managed.ValueCompleter;
@@ -60,10 +61,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -72,6 +70,27 @@ import javax.annotation.Nullable;
 
 /**
  * Defines how an element of a command argument string should be parsed.
+ *
+ * <p>Parameters that parse input and return an object into the
+ * {@link CommandContext} should be of type {@link Parameter.Value} in
+ * order to maximize type safety. However, there are also other important
+ * ways that parameters can be used:</p>
+ *
+ * <ul>
+ *     <li>{@link #firstOf(Parameter)} allows for multiple parameters that
+ *     do not have the same return type to attempt to parse an input
+ *     successfully.</li>
+ *     <li>{@link #seq(Parameter)} allows for the grouping of multiple
+ *     parameters that will be executed one after another.</li>
+ *     <li>{@link Subcommand}s can be placed anywhere in a parameter
+ *     chain where a {@link Parameter} can be added, if successfully parsed,
+ *     any containing {@link Command} would take precedence and its
+ *     {@link Command#process(Cause, String)} method will be called instead
+ *     of any parent.</li>
+ * </ul>
+ *
+ * <p>{@link Parameter}s are intended for use with {@link Command.Builder}s.
+ * </p>
  */
 public interface Parameter {
 
@@ -108,13 +127,22 @@ public interface Parameter {
     /**
      * Gets a {@link Parameter} that represents a subcommand.
      *
+     * <p>If a {@link Subcommand} alias in a parameter chain
+     * is successfully matched, then element parsing will continue
+     * with the parameters supplied to {@link Command}. It is
+     * implementation dependent as to what happens if a subcommand
+     * fails to parse.</p>
+     *
      * @param subcommand The {@link Command} to execute
      * @param alias The first alias of the subcommand
      * @param aliases Subsequent aliases, if any
      * @return The {@link Subcommand} for use in a {@link Parameter} chain
      */
     static Subcommand subcommand(Command subcommand, String alias, String... aliases) {
-        Subcommand.Builder builder = Sponge.getRegistry().createBuilder(Subcommand.Builder.class).setSubcommand(subcommand).alias(alias);
+        Subcommand.Builder builder = Sponge.getRegistry()
+                .createBuilder(Subcommand.Builder.class)
+                .setSubcommand(subcommand)
+                .alias(alias);
         for (String a : aliases) {
             builder.alias(a);
         }
@@ -1008,7 +1036,7 @@ public interface Parameter {
     /**
      * A {@link Subcommand} represents a literal argument where, if parsed, should
      * indicate to the command processor that the
-     * {@link org.spongepowered.api.command.managed.CommandExecutor} of the command
+     * {@link CommandExecutor} of the command
      * should change.
      */
     interface Subcommand extends Parameter {

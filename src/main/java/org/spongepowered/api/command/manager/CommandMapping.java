@@ -25,10 +25,12 @@
 package org.spongepowered.api.command.manager;
 
 import org.spongepowered.api.command.Command;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Provides information about a mapping between a command and its aliases.
@@ -75,6 +77,12 @@ public interface CommandMapping {
      */
     Optional<Command> getCommand();
 
-
+    /**
+     * Gets a {@link Predicate} that
+     *
+     * @return A {@link Predicate} that determines whether the command can be
+     *         run by the given {@link Cause}.
+     */
+    Predicate<Cause> getRequirements();
 
 }

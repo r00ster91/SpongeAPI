@@ -26,9 +26,6 @@ package org.spongepowered.api.command;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.managed.ChildExceptionBehavior;
-import org.spongepowered.api.command.managed.ChildExceptionBehaviors;
-import org.spongepowered.api.command.managed.CommandExecutor;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.flag.Flags;
 import org.spongepowered.api.command.source.CommandSource;
@@ -165,8 +162,15 @@ public interface Command {
     interface Builder extends ResettableBuilder<Command, Builder> {
 
         /**
-         * Adds a {@link Command} as a child to this command, under the
-         * supplied keys. The keys are case insensitive.
+         * Adds a {@link Command} as a top-level child to this command,
+         * using the supplied keys. The keys are case insensitive.
+         *
+         * <p>Children added here will be added to the beginning of the
+         * {@link Parameter}s. Note that if you wish to add a subcommand
+         * in the middle of the parameters, you can do so by creating
+         * a {@link org.spongepowered.api.command.parameter.Parameter.Subcommand}
+         * and adding that as a {@link #parameter(Parameter)} at the
+         * appropriate time.</p>
          *
          * @param child The {@link Command} that is a child.
          * @param keys The keys to register as a sub command.
@@ -182,6 +186,13 @@ public interface Command {
          * Adds a {@link Command} as a child to this command, under the
          * supplied keys. The keys are case insensitive.
          *
+         * <p>Children added here will be added to the beginning of the
+         * {@link Parameter}s. Note that if you wish to add a subcommand
+         * in the middle of the parameters, you can do so by creating
+         * a {@link org.spongepowered.api.command.parameter.Parameter.Subcommand}
+         * and adding that as a {@link #parameter(Parameter)} at the
+         * appropriate time.</p>
+         *
          * @param child The {@link Command} that is a child.
          * @param keys The keys to register as a sub command.
          * @return This builder, for chaining
@@ -193,6 +204,13 @@ public interface Command {
         /**
          * Adds multiple {@link Command} as children to this command,
          * under the supplied keys. The keys are case insensitive.
+         *
+         * <p>Children added here will be added to the beginning of the
+         * {@link Parameter}s. Note that if you wish to add a subcommand
+         * in the middle of the parameters, you can do so by creating
+         * a {@link org.spongepowered.api.command.parameter.Parameter.Subcommand}
+         * and adding that as a {@link #parameter(Parameter)} at the
+         * appropriate time.</p>
          *
          * @param children The {@link Map} that contains a mapping of keys to
          *                 their respective {@link Command} children.
@@ -243,22 +261,6 @@ public interface Command {
 
             return this;
         }
-
-        /**
-         * Determines what to do if a child command throws an exception.
-         *
-         * <p>Defaults to {@link ChildExceptionBehaviors#SUPPRESS}, which means
-         * that if a child command fails to execute, the error will be ignored
-         * and this base command will attempt to execute.</p>
-         *
-         * <p>See {@link ChildExceptionBehaviors} for other possible behaviors.
-         * </p>
-         *
-         * @param exceptionBehavior The {@link ChildExceptionBehavior} to adhere
-         *                          to.
-         * @return This builder, for chaining
-         */
-        Builder setChildExceptionBehavior(ChildExceptionBehavior exceptionBehavior);
 
         /**
          * Provides the logic of the command.
@@ -367,23 +369,6 @@ public interface Command {
          * @return This builder, for chaining
          */
         Builder setExecutionRequirements(@Nullable Predicate<Cause> executionRequirements);
-
-        /**
-         * If this is set to true, then if the parent command (this) has
-         * execution requirements (or a permission) set using
-         * {@link #setPermission(String)} or
-         * {@link #setExecutionRequirements(Predicate)}, then these
-         * requirements are required for all children too. If this is set to
-         * false, then child commands <em>do not</em> require the set
-         * requirements.
-         *
-         * <p>This defaults to {@code true}.</p>
-         *
-         * @param required Whether this command's permission is required for
-         *                 child commands.
-         * @return This builder, for chaining
-         */
-        Builder setCheckRequirementForChildren(boolean required);
 
         /**
          * Builds this command, creating a {@link Command} object.

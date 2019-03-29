@@ -25,7 +25,7 @@
 package org.spongepowered.api.command.parameter.managed;
 
 import org.spongepowered.api.command.exception.ArgumentParseException;
-import org.spongepowered.api.command.managed.CommandExecutor;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.event.cause.Cause;
