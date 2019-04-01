@@ -24,12 +24,41 @@
  */
 package org.spongepowered.api.world.schematic;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3f;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.Queries;
+import org.spongepowered.api.data.persistence.DataTranslator;
+import org.spongepowered.api.entity.EntityArchetype;
+import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
+import org.spongepowered.api.world.extent.BiomeVolume;
 import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
+import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.api.world.extent.UnmodifiableBiomeVolume;
+import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
+import org.spongepowered.api.world.extent.worker.procedure.BiomeVolumeFiller;
+import org.spongepowered.api.world.extent.worker.procedure.BiomeVolumeMapper;
+import org.spongepowered.api.world.extent.worker.procedure.BiomeVolumeMerger;
+import org.spongepowered.api.world.extent.worker.procedure.BiomeVolumeReducer;
+import org.spongepowered.api.world.extent.worker.procedure.BiomeVolumeVisitor;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiFunction;
 
 /**
  * A special archetype volume designed to be persisted. Contains additional
@@ -56,7 +85,27 @@ public interface Schematic extends ArchetypeVolume {
      * 
      * @return The palette
      */
+    @Deprecated
     BlockPalette getPalette();
+
+    /**
+     * Gets the {@link BlockPalette} used by this schematic for serialization.
+     *
+     * @return The block palette
+     */
+    @SuppressWarnings("deprecation")
+    default Palette<BlockState> getBlockPalette() {
+        return getPalette();
+    }
+
+    /**
+     * Gets the {@link Palette Palette<BiomeType>} used by this schematic for serialization.
+     *
+     * @return
+     */
+    default Palette<BiomeType> getBiomePalette() {
+        return PaletteTypes.GLOBAL_BIOMES.create();
+    }
 
     /**
      * Gets any additional metadata attached to this schematic.
@@ -67,6 +116,27 @@ public interface Schematic extends ArchetypeVolume {
 
     @Override
     MutableBlockVolumeWorker<Schematic> getBlockWorker();
+
+    /**
+     * Gets the {@link MutableBiomeVolume} of this schematic. As biomes are
+     * {@link Optional optionally} included and not required, they may be
+     * optionally excluded. If the schematic would contain them, they will be
+     * present during deserialization via {@link DataTranslator}.
+     *
+     * @return The biomes volume, if they're included
+     */
+    default Optional<MutableBiomeVolume> getBiomes() {
+        return Optional.empty();
+    }
+
+    default ListMultimap<Vector3d, EntityArchetype> getEntitiesByPosition() {
+        return ImmutableListMultimap.of();
+    }
+
+    default Collection<EntityArchetype> getEntities() {
+        return Collections.emptyList();
+    }
+
 
     /**
      * A builder for {@link Schematic}s.
@@ -101,8 +171,32 @@ public interface Schematic extends ArchetypeVolume {
          * 
          * @param palette The palette to use for serialization
          * @return This builder, for chaining
+         * @deprecated Use {@link #blockPalette(Palette)}
          */
+        @Deprecated
         Builder palette(BlockPalette palette);
+
+        /**
+         * Specifies a palette for the schematic to use for serialization. This
+         * overrides the {@link #paletteType} value.
+         *
+         * @param palette The palette to use for serialization
+         * @return This builder, for chaining
+         */
+        default Builder blockPalette(Palette<BlockState> palette) {
+            return palette((BlockPalette) palette);
+        }
+
+        /**
+         * Specifies a palette for the schemtic to use for serialization. This
+         * overrides the {@link #paletteType(BlockPaletteType)} value.
+         *
+         * @param palette The palette to use for serialization
+         * @return This builder, for chaining
+         */
+        default Builder biomePalette(Palette<BiomeType> palette) {
+            return this;
+        }
 
         /**
          * Specifies the palette type to use if the {@link #palette} is not
@@ -110,8 +204,47 @@ public interface Schematic extends ArchetypeVolume {
          * 
          * @param type The palette type
          * @return This builder, for chaining
+         * @deprecated Use {@link #blockPaletteType(PaletteType)}
          */
+        @Deprecated
         Builder paletteType(BlockPaletteType type);
+
+        /**
+         * Specifies the palette type to use if the {@link #palette} is not
+         * specified.
+         *
+         * @param type The palette type
+         * @return This builder, for chaining
+         */
+        default Builder blockPaletteType(PaletteType<BlockState> type) {
+            return paletteType((BlockPaletteType) type);
+        }
+
+        /**
+         * Specifies the palette type to use for biomes if the {@link #biomePalette(Palette)}
+         * is not specified.
+         *
+         * @param type The type of biome palette
+         * @return This builder, for chaining
+         */
+        default Builder biomePaletteType(PaletteType<BiomeType> type) {
+            return this;
+        }
+
+        default Builder entity(EntityArchetype entityArchetype) {
+            if (!entityArchetype.getEntityData().contains(Queries.POSITION_X, Queries.POSITION_Y, Queries.POSITION_Z)) {
+                throw new IllegalArgumentException("EntityArchetype is missing position information!");
+            }
+            return this;
+        }
+
+        default Builder entity(EntityArchetype entityArchetype, Vector3d position) {
+            return this;
+        }
+
+        default Builder entities(Collection<EntityArchetype> entities) {
+            return this;
+        }
 
         /**
          * Specifies the metadata container.

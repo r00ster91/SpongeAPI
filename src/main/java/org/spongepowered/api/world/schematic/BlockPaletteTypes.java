@@ -30,11 +30,15 @@ public class BlockPaletteTypes {
 
     /**
      * The global palette containing a mapping of all block states to ids.
+     * @deprecated See {@link PaletteTypes#GLOBAL_BLOCKS}
      */
+    @Deprecated
     public static final BlockPaletteType GLOBAL = DummyObjectProvider.createFor(BlockPaletteType.class, "GLOBAL");
     /**
      * A local palette containing only a subset of the global palette.
+     * @deprecated See {@link PaletteTypes#LOCAL_BLOCKS}
      */
+    @Deprecated
     public static final BlockPaletteType LOCAL = DummyObjectProvider.createFor(BlockPaletteType.class, "LOCAL");
 
     // Suppress default constructor to ensure non-instantiability.
