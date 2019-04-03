@@ -31,7 +31,9 @@ import java.util.Optional;
 
 /**
  * Represents a mapping for block states to a local identifier.
+ * @deprecated Use {@link Palette} for improved generics
  */
+@Deprecated
 public interface BlockPalette extends Palette<BlockState> {
 
     /**

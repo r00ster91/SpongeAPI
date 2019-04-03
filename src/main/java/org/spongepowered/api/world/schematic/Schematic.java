@@ -129,11 +129,13 @@ public interface Schematic extends ArchetypeVolume {
         return Optional.empty();
     }
 
+    @Override
     default ListMultimap<Vector3d, EntityArchetype> getEntitiesByPosition() {
         return ImmutableListMultimap.of();
     }
 
-    default Collection<EntityArchetype> getEntities() {
+    @Override
+    default Collection<EntityArchetype> getEntityArchetypes() {
         return Collections.emptyList();
     }
 
@@ -149,8 +151,13 @@ public interface Schematic extends ArchetypeVolume {
          * <p>If purely creating a schematic it is recommended to instead use
          * the {@link #volume(Extent)} method and pass in an extent view (See
          * {@link Extent#getExtentView}) of the volume to prevent creating
-         * multiple copies of the world data.</p>
-         * 
+         * multiple copies of the world data. Likewise, if {@link BiomeType}s
+         * are needed to be copied, only {@link #volume(Extent)} will support
+         * copying the {@link BiomeType}s at the desired positions. This also
+         * has the same limit for capturing {@link EntityArchetype}s, unless
+         * otherwise manually placed in with {@link #entity(EntityArchetype)}.
+         * </p>
+         *
          * @param volume The archetype volume
          * @return This builder, for chaining
          */

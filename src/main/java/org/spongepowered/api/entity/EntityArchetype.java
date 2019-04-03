@@ -68,8 +68,8 @@ public interface EntityArchetype extends Archetype<EntitySnapshot, Entity> {
      * entity. Note that this is a copied container.
      *
      * <p>Note: While normally, an archetype does not contain position information,
-     * it is possible that {@link Queries#POSITION_X}, {@link Queries#POSITION_Y},
-     * and {@link Queries#POSITION_Z} are included as required by {@link Schematic}s.
+     * it is possible that {@link Queries#POSITION} are included as required by
+     * {@link Schematic}s.
      * </p>
      *
      * @return The copied container of the entity

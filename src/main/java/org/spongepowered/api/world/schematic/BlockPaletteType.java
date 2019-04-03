@@ -30,7 +30,9 @@ import org.spongepowered.api.util.annotation.CatalogedBy;
 
 /**
  * Represents a type of {@link BlockPalette}.
+ * @deprecated Use {@link PaletteType} for better generics
  */
+@Deprecated
 @CatalogedBy(BlockPaletteTypes.class)
 public interface BlockPaletteType extends CatalogType, PaletteType<BlockState> {
 

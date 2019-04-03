@@ -26,6 +26,11 @@ package org.spongepowered.api.world.schematic;
 
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
+/**
+ * An enumeration of known {@link BlockPaletteType}s.
+ * @deprecated Use {@link PaletteTypes}.
+ */
+@Deprecated
 public class BlockPaletteTypes {
 
     /**
